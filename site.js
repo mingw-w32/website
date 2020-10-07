@@ -64,6 +64,15 @@ function load_page_content( src, subtitle )
   load_content( "page-content", src );
 }
 
+function load_page_overlay( src, title, subtitle )
+{ /* Replace the existing page content from the specified overlay
+   * "src" file, updating the page title, and subtitle, as may be
+   * appropriate.
+   */
+  if( title ) document.title = title;
+  load_page_content( src, subtitle );
+}
+
 function new_page( src, subtitle )
 { /* Create a new page display, starting from scratch; assign the
    * displayed title from the HTML document title attribute, adding

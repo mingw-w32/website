@@ -213,4 +213,24 @@ p+ul
   margin: 0; padding-top: 1px; font-weight: normal;
 }
 
+/* Supplementary formatting for sections with numbered headings
+ * ============================================================
+ */
+.h3-numbered
+{ /* On starting any new numbered section division, reset the
+   * heading serial number sequence, and establish a suitable
+   * space at the top of the display region.
+   */
+  counter-reset: h3-number;
+  margin-top: 0.8em;
+}
+.h3-numbered h3::before
+{ /* For each section heading, in sequence, increment the serial
+   * number, and prefix it to the heading text.
+   */
+  counter-increment: h3-number;
+  font-family: inherit; font-size: 0.87em; font-weight: bold;
+  content: counter(h3-number) ". ";
+}
+
 /* $RCSfile$: end of file */
