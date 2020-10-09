@@ -47,8 +47,14 @@ function load_content( container, src )
    */
   var request_handler = new XMLHttpRequest();
   request_handler.onreadystatechange = function()
-  { if( (this.readyState == this.DONE) && (this.status == 200) )
-      set_content( container, this.responseText );
+  { if( this.readyState == this.DONE )
+      switch( this.status )
+      { case 200:
+	  set_content( container, this.responseText );
+	  break;
+	case 404:
+	  load_content( container, "missing.html" );
+      }
   }
   request_handler.open( "GET", src, true );
   request_handler.send();
@@ -59,6 +65,7 @@ function load_page_content( src, subtitle )
    * update the displayed page subtitle, (which may be null), and
    * load the page content from the specified "src" file.
    */
+  set_content( "page-content", null );
   set_content( "page-title", document.title );
   set_content( "page-subtitle", subtitle );
   load_content( "page-content", src );
