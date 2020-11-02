@@ -212,6 +212,23 @@ p+ul
    */
   margin: 0; padding-top: 1px; font-weight: normal;
 }
+dl.masthead
+{ /* On page overlays, we use a definition list to specify the
+   * page title, and subtitle, which are to be propagated to the
+   * masthead section within the page content; the content of the
+   * definition list, itself, should not be directly visible.
+   */
+  display: none;
+}
+dl.masthead+p
+{ /* The masthead section is separated from the remaining page
+   * content, by a horizontal rule; to keep white space balanced,
+   * above and below this rule, when it is immediately followed
+   * by a paragraph, with no intervening heading, we need to
+   * explicitly adjust the paragraph margin.
+   */
+  margin-top: 1.3em;
+}
 
 /* Supplementary formatting for sections with numbered headings
  * ============================================================

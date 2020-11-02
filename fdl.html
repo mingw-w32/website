@@ -40,6 +40,16 @@
  * DAMAGE.
  *
 -->
+<dl class="masthead"><!-- hidden for masthead class -->
+<!-- FIXME: is there a better way to do this?  We need to propagate
+ content to the "as-page-title" and "as-page-subtitle" place-holders,
+ within the "page-content" div of "index.html"; our javascript page
+ loader will explicitly look for these hidden elements, and copy
+ their content into the corresponding visible place-holders.
+-->
+ <dt id="page-title">MinGW.org Licensing</dt>
+ <dt id="page-subtitle">The MinGW Free Documentation Licence</dt>
+</dl><!-- masthead -->
 <p>Copyright &copy; 2020, MinGW.org Project
 </p>
 <p>Redistribution and use in source and 'compiled' forms (SGML, HTML,

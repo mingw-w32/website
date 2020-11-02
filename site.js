@@ -39,6 +39,25 @@ function set_content( item, value )
   if( element ) element.innerHTML = value;
 }
 
+function no_break( text )
+{ /* Helper function to replace all occurrences of ASCII hyphen-minus,
+   * within "text", by substitution of HTML non-breaking hyphen.
+   */
+  return text.replace( /-/g, "&#8209;" );
+}
+
+function update_page_content_header( tag )
+{ /* Update the "page-title" and "page-subtitle" content-header text,
+   * by substitution into the "as-page-title" and "as-page-subtitle"
+   * place-holder elements, respectively.
+   */
+  var element = document.getElementById( "page-".concat( tag ));
+  if( element )
+  { if( tag == "title" ) document.title = element.innerHTML;
+    set_content( "as-page-".concat( tag ), no_break( element.innerHTML ));
+  }
+}
+
 function load_content( container, src )
 { /* Set the content of the specified HTML "container" element, by
    * injection of the entire contents of an external file which is
@@ -51,6 +70,8 @@ function load_content( container, src )
       switch( this.status )
       { case 200:
 	  set_content( container, this.responseText );
+	  update_page_content_header( "title" );
+	  update_page_content_header( "subtitle" );
 	  break;
 	case 404:
 	  load_content( container, "missing.html" );
@@ -60,34 +81,19 @@ function load_content( container, src )
   request_handler.send();
 }
 
-function load_page_content( src, subtitle )
-{ /* Propagate the HTML document title to the "masthead" display,
-   * update the displayed page subtitle, (which may be null), and
-   * load the page content from the specified "src" file.
+function load_page( src )
+{ /* Load page content from the HTML fragment file, as determined
+   * from the specified "src" URL; if no alternative fragment name
+   * is specified, fall back to loading "about.html".
    */
-  set_content( "page-content", null );
-  set_content( "page-title", document.title );
-  set_content( "page-subtitle", subtitle );
-  load_content( "page-content", src );
-}
-
-function load_page_overlay( src, title, subtitle )
-{ /* Replace the existing page content from the specified overlay
-   * "src" file, updating the page title, and subtitle, as may be
-   * appropriate.
-   */
-  if( title ) document.title = title;
-  load_page_content( src, subtitle );
-}
-
-function new_page( src, subtitle )
-{ /* Create a new page display, starting from scratch; assign the
-   * displayed title from the HTML document title attribute, adding
-   * the specified subtitle, lay out the standard page header block,
-   * and load the page content from the "src" file.
-   */
+  const ref = "?page=";
+  const div = "page-content";
+  set_content( div, null );
   load_content( "header", "header.html" );
-  load_page_content( src, subtitle );
+  if( src.includes( ref ) )
+    src = src.substring( src.indexOf( ref ) + ref.length, src.length );
+  else src = "about.html";
+  load_content( div, src );
 }
 
 /* $RCSfile$: end of file */

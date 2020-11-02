@@ -49,6 +49,16 @@
  *    &#8221;   right (closing) typographic double quote
  *
 -->
+<dl class="masthead"><!-- hidden for masthead class -->
+<!-- FIXME: is there a better way to do this?  We need to propagate
+ content to the "as-page-title" and "as-page-subtitle" place-holders,
+ within the "page-content" div of "index.html"; our javascript page
+ loader will explicitly look for these hidden elements, and copy
+ their content into the corresponding visible place-holders.
+-->
+ <dt id="page-title">MinGW.org Licensing</dt>
+ <dt id="page-subtitle">Terms of Use for MinGW.org Products and Resources</dt>
+</dl><!-- masthead -->
 <div class="h3-numbered">
 <p>Each of the various packages,
 which are distributed by MinGW.org,
@@ -60,9 +70,7 @@ are as follows:&mdash;
 <h3>MinGW.org Web&#8209;Site Content</h3>
 <p>Publication of the content of this MinGW.org web&#8209;site is
 subject to the terms of
-<a href="#"
-onclick="load_page_content('fdl.html','The MinGW Free Documentation Licence')"
->this MinGW specific adaptation</a>
+<a href="index.html?page=fdl.html">this MinGW specific adaptation</a>
 of the
 <a rel="noopener noreferrer" target="_blank"
 href="https://www.freebsd.org/copyright/freebsd-doc-license.html"
