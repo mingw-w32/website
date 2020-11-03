@@ -72,6 +72,7 @@ function load_content( container, src )
 	  set_content( container, this.responseText );
 	  update_page_content_header( "title" );
 	  update_page_content_header( "subtitle" );
+	  set_content( "e404-missing-page", document.URL );
 	  break;
 	case 404:
 	  load_content( container, "missing.html" );
