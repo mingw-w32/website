@@ -1,0 +1,363 @@
+<!DOCTYPE HTML><!--
+ *
+ * mailing.html
+ *
+ * $Id$
+ *
+ * Written by Keith Marshall <keith@users.osdn.me>
+ * Copyright (C) 2020, MinGW.org Project
+ *
+ * Uses a web-search form-field implementation derived from the
+ * DuckDuckGo search widget implementation by Juri Wornowitski, as
+ * described at https://www.plainlight.com/ddg
+ *
+ *
+ * Redistribution and use in source and 'compiled' forms (SGML, HTML,
+ * PDF, PostScript, RTF, etc) with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer as
+ *    the first lines of this file, unmodified.
+ *
+ * 2. Redistributions in compiled form (transformed to other DTDs,
+ *    converted to PDF, PostScript, RTF and other formats) must
+ *    reproduce the above copyright notice, this list of conditions
+ *    and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS DOCUMENTATION IS PROVIDED BY THE MINGW.ORG PROJECT "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE MINGW.ORG PROJECT, OR
+ * ITS CONTRIBUTORS, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ *
+ *
+ * Note: this page assumes browser support for the following numeric
+ * HTML entity codes:
+ *
+ *    &#8209;	non-breaking hyphen
+ *    &#8217;	typographic apostrophe
+ *    &#8220;   left (opening) typographic double quote
+ *    &#8221;   right (closing) typographic double quote
+ *
+-->
+<dl class="masthead"><!-- hidden for masthead class -->
+<!-- FIXME: is there a better way to do this?  We need to propagate
+ content to the "as-page-title" and "as-page-subtitle" place-holders,
+ within the "page-content" div of "index.html"; our javascript page
+ loader will explicitly look for these hidden elements, and copy
+ their content into the corresponding visible place-holders.
+-->
+ <dt id="page-title">MinGW.org Mailing-Lists</dt>
+ <dt id="page-subtitle">Mailing-Lists and Mail Archives Operated by MinGW.org</dt>
+</dl><!-- masthead -->
+<p>MinGW.org&#8217;s preferred method for communication,
+between users and the project team, is by way of mailing&#8209;lists.
+Historically, there were several topic&#8209;specific lists, originally
+<a rel="noopener noreferrer" target="_blank"
+ href="https://sourceforge.net/p/mingw/mailman/"
+>hosted on SourceForge.net</a>;
+today, only two remain operational, and both are
+<a rel="noopener noreferrer" target="_blank"
+ href="https://osdn.net/projects/mingw/lists/"
+>hosted on OSDN.net</a>.
+</p>
+<h3>Operational Mailing&#8209;Lists</h3>
+<p>The currently operational
+MinGW.org mailing&#8209;lists are:&mdash;
+</p>
+<dl class="no-indent" id="mingw-users">
+<dt><a rel="noopener noreferrer" target="_blank"
+ href="https://lists.osdn.me/mailman/listinfo/mingw-users"
+>MinGW&#8209;Users Mailing&#8209;List</a>
+</dt>
+<dd>This is the primary conduit for dialogue between MinGW users
+and the MinGW.org project team;
+(you are advised to use this mailing&#8209;list
+at any time when you wish to engage in such dialogue).
+It is a public mailing&#8209;list, but to avoid spam,
+<a rel="noopener noreferrer" target="_blank"
+ href="https://lists.osdn.me/mailman/listinfo/mingw-users"
+>you <em>must</em> subscribe</a>
+<em>before</em> you will be
+permitted to post your first message,
+(and your subscription <em>must</em> remain active,
+if you wish to post subsequent messages).
+</dd>
+<dd>Before
+posting to this mailing&#8209;list
+you are advised to acquaint yourself with the
+<a href="#list-etiquette">posting etiquette</a>;
+failure to comply with this etiquette may seriously impair
+your chances of receiving a useful response,
+and, in cases of flagrant disregard,
+may even result in your future posts being moderated.
+</dd>
+<dd>Previous correspondence,
+posted to this mailing&#8209;list between February&nbsp;2018
+and the present day, has been
+<a rel="noopener noreferrer" target="_blank"
+ href="https://osdn.net/projects/mingw/lists/archive/users"
+>archived on OSDN.net</a>;
+(earlier correspondence, prior to February&nbsp;2018, has also been
+<a rel="noopener noreferrer" target="_blank"
+ href="https://sourceforge.net/p/mingw/mailman/mingw-users"
+>archived, on SourceForge.net</a>).
+As noted in the <a href="#list-etiquette">etiquette</a>,
+before you introduce a new topic on this mailing&#8209;list,
+you are advised to search these archives,
+to ensure that you are not asking a question
+which has already been answered.
+You may use the following pair of search boxes to perform
+keyword searches within the OSDN.net (upper),
+and the SourceForge.net (lower box) archives, respectively.
+(If your question relates to MSYS, you may also wish to refer to the
+<a href="#mingw-msys">historical MinGW&#8209;MSYS archive, below</a>).
+<form class="search" method="get" action="https://duckduckgo.com/" target="_blank">
+  <button class="fa fa-search" type="submit"></button>
+  <input type="text" name="q" placeholder="Search MinGW-Users on OSDN.net ..." />
+  <input type="hidden" name="sites" value="https://osdn.net/projects/mingw/lists/archive/users" />
+  <input type="hidden" name="kn" value="1" />
+</form>
+<form class="search" method="get" action="https://sourceforge.net/p/mingw/mailman/search/" target="_blank">
+  <button class="fa fa-search" type="submit"></button>
+  <input type="text" name="q" placeholder="Search MinGW-Users on SourceForge.net ..." />
+  <input type="hidden" name="mailing_list" value="mingw-users" />
+</form>
+</dd>
+</dl><dl class="no-indent" id="mingw-notify">
+<dt><a rel="noopener noreferrer" target="_blank"
+ href="https://lists.osdn.me/mailman/listinfo/mingw-notify"
+>MinGW&#8209;Notify Mailing&#8209;List</a>
+</dt>
+<dd>This is a <em>read&#8209;only</em> mailing&#8209;list,
+which is used to deliver notifications of source code repository updates,
+issue tracker submissions, and feature request submissions.
+If you would like to receive such notifications,
+you are welcome to subscribe to this mailing&#8209;list,
+but please <em>do not</em> attempt to post messages to it.
+</dd>
+<dd>Notifications posted to this mailing&#8209;list,
+since November&nbsp;2017, have been
+<a rel="noopener noreferrer" target="_blank"
+ href="https://osdn.net/projects/mingw/lists/archive/notify"
+>archived on OSDN.net</a>,
+while notifications posted prior to September&nbsp;2017 have been
+<a rel="noopener noreferrer" target="_blank"
+ href="https://sourceforge.net/p/mingw/mailman/mingw-notify"
+>archived, on SourceForge.net</a>.
+Once again, you may use the following pair of search boxes
+to perform keyword searches on these archives, respectively.
+<form class="search" method="get" action="https://duckduckgo.com/" target="_blank">
+  <button class="fa fa-search" type="submit"></button>
+  <input type="text" name="q" placeholder="Search MinGW-Notify on OSDN.net ..." />
+  <input type="hidden" name="sites" value="https://osdn.net/projects/mingw/lists/archive/notify" />
+  <input type="hidden" name="kn" value="1" />
+</form>
+<form class="search" method="get" action="https://sourceforge.net/p/mingw/mailman/search/" target="_blank">
+  <button class="fa fa-search" type="submit"></button>
+  <input type="text" name="q" placeholder="Search MinGW-Notify on SourceForge.net ..." />
+  <input type="hidden" name="mailing_list" value="mingw-notify" />
+</form>
+</dd>
+</dl>
+<h3>Historical Mailing&#8209;List Archives</h3>
+<p>In earlier days of the project history,
+the volume of mailing&#8209;list traffic was significantly greater
+than it is today.
+This traffic was distributed over five topic&#8209;specific
+mailing&#8209;lists, of which only the two identified above
+remain operational today;
+the other three historical lists, which are identified below,
+are now closed, and it is no longer possible to subscribe,
+or to post messages to them.
+However, archives of historical postings remain
+<a rel="noopener noreferrer" target="_blank"
+ href="https://sourceforge.net/p/mingw/mailman/"
+>available on SourceForge.net</a>,
+and may be searched using their respective keyword&#8209;search boxes,
+below.
+</p>
+<dl class="no-indent" id="mingw-msys">
+<dt><a rel="noopener noreferrer" target="_blank"
+ href="https://sourceforge.net/p/mingw/mailman/mingw-msys"
+>MinGW&#8209;MSYS Mailing&#8209;List</a>
+</dt>
+<dd>This was a public mailing&#8209;list,
+dedicated to correspondence relating specifically to MSYS,
+in order to segregate it from more general MinGW&#8209;Users list traffic;
+today, such correspondence should be directed to
+<a href="#mingw-users">the MinGW&#8209Users mailing&#8209;list</a>.
+</dd>
+<dd>You may use this search box to perform a keyword search
+on the historical MinGW-MSYS archive.
+<form class="search" method="get" action="https://sourceforge.net/p/mingw/mailman/search/" target="_blank">
+  <button class="fa fa-search" type="submit"></button>
+  <input type="text" name="q" placeholder="Search MinGW-MSYS on SourceForge.net ..." />
+  <input type="hidden" name="mailing_list" value="mingw-msys" />
+</form>
+</dd>
+<dt><a rel="noopener noreferrer" target="_blank"
+ href="https://sourceforge.net/p/mingw/mailman/mingw-dvlpr"
+>MinGW&#8209;Dvlpr Mailing&#8209;List</a>
+</dt>
+<dd>This was a private, but publicly archived mailing&#8209;list,
+which was used by MinGW.org Project contributors, to discuss various
+aspects of project development; this mailing&#8209;list has now been
+superseded by alternative web technologies, for such discussion.
+</dd>
+<dd>You may use this search box to perform a keyword search
+on the historical MinGW-Dvlpr public archive.
+<form class="search" method="get" action="https://sourceforge.net/p/mingw/mailman/search/" target="_blank">
+  <button class="fa fa-search" type="submit"></button>
+  <input type="text" name="q" placeholder="Search MinGW-Dvlpr on SourceForge.net ..." />
+  <input type="hidden" name="mailing_list" value="mingw-dvlpr" />
+</form>
+</dd>
+<dt><a rel="noopener noreferrer" target="_blank"
+ href="https://sourceforge.net/p/mingw/mailman/mingw-cvs"
+>MinGW&#8209;CVS Mailing&#8209;List</a>
+</dt>
+<dd>This obsolete <em>read&#8209;only</em> mailing&#8209;list was
+formerly used for posting of notifications of updates to the
+MinGW.org CVS, (and more recently <em>git</em>),
+source code repositories;
+since migration of these repositories to
+<a rel="noopener noreferrer" target="_blank"
+ href="https://osdn.net/projects/mingw/scm/"
+>OSDN.net</a>, such notifications have been directed to
+<a href="#mingw-notify">the MinGW&#8209;Notify mailing&#8209;list</a>.
+</dd>
+<dd>You may use this search box to perform a keyword search
+on the historical MinGW-CVS archive.
+<form class="search" method="get" action="https://sourceforge.net/p/mingw/mailman/search/" target="_blank">
+  <button class="fa fa-search" type="submit"></button>
+  <input type="text" name="q" placeholder="Search MinGW-CVS on SourceForge.net ..." />
+  <input type="hidden" name="mailing_list" value="mingw-cvs" />
+</form>
+</dd>
+</dl>
+<div id="list-etiquette">
+<h3>Mailing&#8209;List Posting Etiquette</h3>
+<p>MinGW is an open source project.
+As such, it is heavily dependent on people who dedicate
+their spare time to the goals and continuing development of the project,
+so please keep this in mind when posting to the mailing&#8209;list.
+</p>
+<p>Before you post, you are advised to
+acquaint yourself with the following commonly accepted guidelines,
+with which you are strongly encouraged to comply,
+when composing your posts.
+Failure to comply with these guidelines may result
+in your posts being ignored by a number of knowledgeable people,
+and repeated offenses may even lead to your posts being vetted,
+and potentially rejected, by the list moderator.
+</p>
+<ul style="padding-right: 1em">
+<li>The language of the lists is <em><strong>English</strong></em>&hairsp;;
+if you post in any other language, you are unlikely to elicit a response.
+</li>
+<li><em><strong>Do search</strong></em> the mailing list archives,
+(both the current archives, and those of the historical topic&#8209;specific
+lists), before posting, (see the links associated with each of the lists above);
+many questions have already been asked and answered.
+</li>
+<li><em><strong>Do use</strong></em>
+a <em><strong>meaningful</strong></em> subject line.
+A subject line should include a pertinent few words summarizing
+the subject of the email;
+(when one replies to emails,
+one should always make certain the subject line of the email is still
+relevant to the reply).
+In particular, if you receive list mail in digest format,
+<em><strong>do always</strong></em>
+set the subject back to the original text,
+from the message to which you are replying.
+<em><strong>Do not</strong></em> reply with a subject of
+<em>&#8220;Re: MinGW-??? Digest no. ???&#8221;</em>;
+such replies are prime candidates for deletion, without being read.
+</li>
+<li><em><strong>Do post</strong></em> in a MIME format with
+<em>&#8220;Content-Type: text</em>/<em>plain&#8221;</em>.
+<em><strong>Do not</strong></em> post as HTML, or in any other MIME format,
+(and in particular, <em><strong>do not</strong></em> use multi-part MIME,
+with plain text duplicated as HTML);
+some list subscribers are unable to, or choose not to read such mail,
+and will be unable or unwilling to answer you.
+</li>
+<li><em><strong>Do not</strong></em>
+post messages with very long lines of text;
+except when pasting screenshots, where line wrapping might lead to confusion,
+ensure that lines of running text are wrapped with hard line breaks,
+at a length of between 65 and 72 characters.
+</li>
+<li><em><strong>Do quote</strong></em> sections of the original text,
+and <em><strong>interleave</strong></em> your replies to individual points,
+<em><strong>below</strong></em> the relevant context.
+<em><strong>Do not</strong></em> 
+<a rel="noopener noreferrer" target="_blank"
+ href="http://en.wikipedia.org/wiki/Top_post"
+>top-post</a>;
+(this 
+<a rel="noopener noreferrer" target="_blank"
+ href="http://redballoon.net/~snorwood/quote-rant.shtml"
+>treatise</a>
+explains why top-posting is considered unacceptable).
+</li>
+<li><em><strong>Do trim out</strong></em> sections of the original mail,
+which are not required to establish the context of your reply.
+(Once more,
+this is particularly important when replying to mail received in digest form;
+<em><strong>do reply</strong></em>
+to <em><strong>one subject at a time</strong></em>,
+and <em><strong>do remove</strong></em> all content related to other subjects).
+<em><strong>Do not</strong></em> persistently recycle irrelevant junk,
+quoted from earlier messages in the thread.
+</li>
+<li><em><strong>Do not</strong></em>
+include <em>&#8220;legal mumble&#8221;</em> signatures.
+You are posting to a list that will be read by thousands of users,
+and anything you say will be archived in the public domain;
+in this context, such drivel in your signature is neither enforceable,
+nor meaningful.
+</li>
+<li><em><strong>Do not hijack</strong></em> an existing topic thread,
+when you wish to introduce an unrelated subject;
+(i.e. <em><strong>do not</strong></em> reply to an existing message,
+when your reply is unrelated to the original subject).
+When you want to introduce a new topic, plainly start a new thread,
+(i.e. a completely new message).
+Replying in an existing thread confuses mail readers
+and humans who are trying to participate in the original discussion;
+it is a sure way to irritate other subscribers,
+and will likely get you ignored,
+if not even black-listed.
+</li>
+</ul>
+<p>Historical information on <em>netiquette</em> may be found in 
+<a rel="noopener noreferrer" target="_blank"
+ href="http://www.faqs.org/rfcs/rfc1855.html"
+>RFC-1855</a>.
+</p>
+<p>This
+<a rel="noopener noreferrer" target="_blank"
+ href="http://linuxmafia.com/faq/Essays/smart-questions.html"
+>article</a>,
+(also available 
+<a rel="noopener noreferrer" target="_blank"
+ href="http://www.catb.org/~esr/faqs/smart-questions.html"
+>here</a>),
+offers valuable advice on how to ask questions,
+in a manner most likely to elicit useful replies.
+</p>
+</div><!-- list-etiquette -->
+
+<!-- $RCSfile$: end of file -->
