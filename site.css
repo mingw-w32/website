@@ -255,6 +255,30 @@ dl.masthead+p
 }
 
 
+/* Subsection Reference Positioning Relative to Page Header
+ * ========================================================
+ */
+.overlapped
+{ /* Any internal page reference will be positioned at the same
+   * vertical offset, within the viewport, as the top of the page
+   * header block.  Thus, any text which appears within the upper
+   * 70px of the subsection division will be hidden behind the
+   * header block; adjust the alignment of the target element,
+   * such that its top margin overlaps the lower region of the
+   * preceding element, by the depth of the header block, then
+   * pad it, to push the content downward, into the viewport.
+   */
+  margin-top: -70px; padding-top: 70px;
+}
+hr+div.overlapped
+{ /* When an overlapped division follows a horizontal rule, we
+   * need to adjust its position upward, to allow for the blank
+   * space in the bottom margin of the rule element.
+   */
+  margin-top: calc( -70px - 0.6em );
+}
+
+
 /* Supplementary Formatting for Sections with Numbered Headings
  * ============================================================
  */

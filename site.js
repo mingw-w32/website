@@ -73,6 +73,11 @@ function load_content( container, src )
 	  update_page_content_header( "title" );
 	  update_page_content_header( "subtitle" );
 	  set_content( "e404-missing-page", document.URL );
+	  if( src.includes("#") )
+	  { src = src.substring( src.indexOf("#") + 1, src.length );
+	    element = document.getElementById( src );
+	    if( element ) element.scrollIntoView();
+	  }
 	  break;
 	case 404:
 	  load_content( container, "missing.html" );
