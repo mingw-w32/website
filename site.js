@@ -37,25 +37,18 @@ function set_content( item, value )
    */
   var element = document.getElementById( item );
   if( element ) element.innerHTML = value;
+  return element;
 }
 
-function no_break( text )
-{ /* Helper function to replace all occurrences of ASCII hyphen-minus,
-   * within "text", by substitution of HTML non-breaking hyphen.
+function set_page( title, text )
+{ /* Helper function, for use in overlay page scripts, to update
+   * the "title" and "subtitle" fields within the page header; note
+   * that "text" may, and should, use ASCII hyphen-minus where any
+   * hyphen is to be represented; these will be replaced by HTML
+   * non-breaking hyphen entities, on header field assignment.
    */
-  return text.replace( /-/g, "&#8209;" );
-}
-
-function update_page_content_header( tag )
-{ /* Update the "page-title" and "page-subtitle" content-header text,
-   * by substitution into the "as-page-title" and "as-page-subtitle"
-   * place-holder elements, respectively.
-   */
-  var element = document.getElementById( "page-".concat( tag ));
-  if( element )
-  { if( tag == "title" ) document.title = element.innerHTML;
-    set_content( "as-page-".concat( tag ), no_break( element.innerHTML ));
-  }
+  if( title == "title" ) document.title = text;
+  set_content( "page-".concat( title ), text.replace( /-/g, "&#8209;" ));
 }
 
 function load_content( container, src )
@@ -69,10 +62,13 @@ function load_content( container, src )
   { if( this.readyState == this.DONE )
       switch( this.status )
       { case 200:
-	  set_content( container, this.responseText );
-	  update_page_content_header( "title" );
-	  update_page_content_header( "subtitle" );
+	  var element = set_content( container, this.responseText );
+	  var idx; element = element.getElementsByTagName( "script" );
 	  set_content( "e404-missing-page", document.URL );
+	  for( idx = 0; idx < element.length; idx++ )
+	  { var onload_action = Function( element[idx].innerHTML );
+	    onload_action();
+	  }
 	  if( src.includes("#") )
 	  { src = src.substring( src.indexOf("#") + 1, src.length );
 	    element = document.getElementById( src );

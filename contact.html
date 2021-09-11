@@ -48,16 +48,15 @@
  *    &#8221;   right (closing) typographic double quote
  *
 -->
-<dl class="masthead"><!-- hidden for masthead class -->
-<!-- FIXME: is there a better way to do this?  We need to propagate
- content to the "as-page-title" and "as-page-subtitle" place-holders,
- within the "page-content" div of "index.html"; our javascript page
- loader will explicitly look for these hidden elements, and copy
- their content into the corresponding visible place-holders.
--->
- <dt id="page-title">Contacting MinGW.OSDN</dt>
- <dt id="page-subtitle">When a Web-Search Fails to Resolve your Issue</dt>
-</dl><!-- masthead -->
+<script class="masthead"><!-- hidden for masthead class -->
+/* Script fragment, to assign titles specific to this page; this is
+ * encapsulated within the "masthead", where such titles are displayed,
+ * to ensure that whatever page content may follow will be correctly
+ * positioned, relative to the masthead content.
+ */
+ set_page("title", "Contacting MinGW.OSDN");
+ set_page("subtitle", "When a Web-Search Fails to Resolve your Issue");
+</script><!-- masthead -->
 <p>If you have exhausted all of the web&#8209;site resources,
 and you have searched all of the
 <a href="index.html?page=mailing.html"

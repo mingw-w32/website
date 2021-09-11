@@ -8,7 +8,7 @@
 -->
 <html lang="en">
  <head>
-  <meta charset="utf-8" />
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <title>Welcome to MinGW.OSDN</title>
   <!--
    * $Id$
@@ -54,8 +54,11 @@
   <div id="header"></div>
   <div class="page-view">
    <div class="masthead">
-    <h1 id="as-page-title"></h1>
-    <h2 id="as-page-subtitle"></h2>
+    <!-- The HTML specification disallows empty headings -->
+    <!-- so, insert invisible place-holders, which we may -->
+    <!-- override later, by overlay page scripting -->
+    <h1 id="page-title"><span style="display:none">:</span></h1>
+    <h2 id="page-subtitle"><span style="display:none">:</span></h2>
    </div><!-- masthead --><hr />
    <div id="page-content"></div>
   </div><!-- page-view -->

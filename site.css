@@ -244,7 +244,7 @@ dl.masthead
    */
   display: none;
 }
-dl.masthead+p
+.masthead+p
 { /* The masthead section is separated from the remaining page
    * content, by a horizontal rule; to keep white space balanced,
    * above and below this rule, when it is immediately followed

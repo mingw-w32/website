@@ -49,16 +49,15 @@
  *    &#8221;   right (closing) typographic double quote
  *
 -->
-<dl class="masthead"><!-- hidden for masthead class -->
-<!-- FIXME: is there a better way to do this?  We need to propagate
- content to the "as-page-title" and "as-page-subtitle" place-holders,
- within the "page-content" div of "index.html"; our javascript page
- loader will explicitly look for these hidden elements, and copy
- their content into the corresponding visible place-holders.
--->
- <dt id="page-title">MinGW.OSDN Mailing-Lists</dt>
- <dt id="page-subtitle">Mailing-Lists and Mail Archives Operated by MinGW.OSDN</dt>
-</dl><!-- masthead -->
+<script class="masthead">
+/* Script fragment, to assign titles specific to this page; this is
+ * encapsulated within the "masthead", where such titles are displayed,
+ * to ensure that whatever page content may follow will be correctly
+ * positioned, relative to the masthead content.
+ */
+ set_page("title", "MinGW.OSDN Mailing-Lists");
+ set_page("subtitle", "Mailing-Lists and Mail Archives Operated by MinGW.OSDN");
+</script><!-- masthead -->
 <p>MinGW.OSDN&#8217;s preferred method for communication,
 between users and the project team, is by way of mailing&#8209;lists.
 Historically, there were several topic&#8209;specific lists, originally
@@ -261,7 +260,7 @@ in your posts being ignored by a number of knowledgeable people,
 and repeated offenses may even lead to your posts being vetted,
 and potentially rejected, by the list moderator.
 </p>
-<ul style="padding-right: 1em">
+<ul>
 <li>The language of the lists is <em><strong>English</strong></em>&hairsp;;
 if you post in any other language, you are unlikely to elicit a response.
 </li>
