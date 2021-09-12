@@ -120,11 +120,19 @@ keyword searches within the OSDN.net (upper),
 and the SourceForge.net (lower box) archives, respectively.
 (If your question relates to MSYS, you may also wish to refer to the
 <a href="#mingw-msys">historical MinGW&#8209;MSYS archive, below</a>).
+<!-- Search widget using DuckDuckGo, does not work well on OSDN! --><!--
 <form class="search" method="get" action="https://duckduckgo.com/" target="_blank">
   <button class="fa fa-search" type="submit"></button>
   <input type="text" name="q" placeholder="Search MinGW-Users on OSDN.net ..." />
   <input type="hidden" name="sites" value="https://osdn.net/projects/mingw/lists/archive/users" />
   <input type="hidden" name="kn" value="1" />
+</form>
+--><!-- Alternative search widget, using Google, does work -->
+<form class="search" onsubmit="ddg_widget(this).click()">
+  <button class="fa fa-search" type="submit"
+    onclick="return ddg_google_search(this, true, osdn_archive('mingw', 'users'))"
+  ></button>
+  <input type="text" name="q" placeholder="Search MinGW-Users on OSDN.net ..." />
 </form>
 <form class="search" method="get" action="https://sourceforge.net/p/mingw/mailman/search/" target="_blank">
   <button class="fa fa-search" type="submit"></button>
@@ -155,11 +163,19 @@ while notifications posted prior to September&nbsp;2017 have been
 >archived, on SourceForge.net</a>.
 Once again, you may use the following pair of search boxes
 to perform keyword searches on these archives, respectively.
+<!-- Search widget using DuckDuckGo, does not work well on OSDN! --><!--
 <form class="search" method="get" action="https://duckduckgo.com/" target="_blank">
   <button class="fa fa-search" type="submit"></button>
   <input type="text" name="q" placeholder="Search MinGW-Notify on OSDN.net ..." />
   <input type="hidden" name="sites" value="https://osdn.net/projects/mingw/lists/archive/notify" />
   <input type="hidden" name="kn" value="1" />
+</form>
+--><!-- Alternative search widget, using Google, does work -->
+<form class="search" onsubmit="ddg_widget(this).click()">
+  <button class="fa fa-search" type="submit"
+    onclick="return ddg_google_search(this, true, osdn_archive('mingw', 'notify'))"
+  ></button>
+  <input type="text" name="q" placeholder="Search MinGW-Notify on OSDN.net ..." />
 </form>
 <form class="search" method="get" action="https://sourceforge.net/p/mingw/mailman/search/" target="_blank">
   <button class="fa fa-search" type="submit"></button>

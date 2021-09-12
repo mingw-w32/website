@@ -98,4 +98,78 @@ function load_page( src )
   load_content( div, src );
 }
 
+/* Web-Search Widget Helper Functions
+ * ----------------------------------
+ * Derived from the DuckDuckGo.com search widget implementation by
+ * Juri Wornowitski, as described at https://www.plainlight.com/ddg,
+ * these facilitate incorporation of multiple search widget variants,
+ * at multiple locations across the site.
+ *
+ */
+function ddg_widget( ref )
+{ /* Acquire a reference to the "submit" button, within the search
+   * widget; the containing "form" element uses this to simulate a
+   * click event, if the form is submitted by pressing the "enter"
+   * key, when the "input" field has the focus.
+   */
+  ref = ref.getElementsByTagName( "button" );
+  for( idx = 0; idx < ref.length; idx++ )
+    if( ref[idx].type == "submit" ) return ref[idx];
+  return undefined;
+}
+
+function ddg_google_search_site( domain )
+{ /* Encode a search "domain" as a "site:" reference, to be appended
+   * to the query URL, when a DuckDuckGo.com search is directed to the
+   * Google search engine, via DuckDuckGo.com's "bang" facility.
+   */
+  return "+".concat( encodeURIComponent( "site:".concat( domain )));
+}
+
+function ddg_bang( src, query, domain )
+{ /* Set up a query, using DuckDuckGo.com's "bang" facility, (directed
+   * to the "bang" identified by "src"); append the query, appropriately
+   * encoded, and optionally a "domain" URL whence the query results are
+   * to be retrieved.
+   */
+  const bang = "https://duckduckgo.com?q=".concat( encodeURIComponent( "!" ));
+  query = bang.concat( src.concat( "+".concat( encodeURIComponent( query ))));
+  return query.concat( domain );
+}
+
+function ddg_query( widget )
+{ /* Retrieve the current value entered into the query "input" field;
+   * (this is identified by having a "name" property value of "q").
+   */
+  widget = widget.getElementsByTagName( "input" );
+  for( idx = 0; idx < widget.length; idx++ )
+    if( widget[idx].name == "q" ) return widget[idx].value;
+  return undefined;
+}
+
+function ddg_google_search( widget, target, domain )
+{ /* Initiate a Google search, from the DuckDuckGo.com search widget;
+   * (the "widget" reference is initially associated with the "submit"
+   * button, whence we retrieve the query context via the parent form).
+   * If "domain" is not null, it is assumed to represent a "site:" URL,
+   * where the search is to be performed, while boolean value "target"
+   * indicates whether or not a new browser window is to be opened to
+   * display the search results.
+   */
+  var query = ddg_query( widget.parentElement );
+  if( domain.length > 0 ) domain = ddg_google_search_site( domain );
+  if( target ) window.open( ddg_bang( "g", query, domain ));
+  else ddg_bang( "g", query, domain );
+  return false;
+}
+
+function osdn_archive( project, list )
+{ /* Construct a URL to represent the search domain for an OSDN.net
+   * mailing list archive, for any specified "list", belonging to a
+   * specified "project".
+   */
+  const template = "https://osdn.net/projects/%P%/lists/archive/";
+  return template.replace( "%P%", project ).concat( list );
+}
+
 /* $RCSfile$: end of file */
