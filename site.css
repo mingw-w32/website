@@ -107,7 +107,7 @@ p+ul, p+ol, p+dl
   margin-top: 0.3em; margin-bottom: 0;
 }
 ul li, ol li
-{ margin-top: 0.12em;
+{ margin-top: 0.12em; margin-right: 1.2em;
 }
 ul li:first-child, ol li:first-child
 { margin-top: 0;
@@ -204,6 +204,20 @@ dl.no-indent dd
 }
 
 
+/* Document Reference Tables of Content Formatting
+ * ===============================================
+ */
+dl.toc
+{ margin: calc( -70px - 0.6em ) 0 0; padding-top: calc( 70px + 0.6em );
+}
+dl.toc h4
+{ margin: 0.2em 0;
+}
+dl.toc dt
+{ margin: 0; min-width: 100%;
+}
+
+
 /* General Page Content Formatting
  * ===============================
  */
@@ -297,6 +311,50 @@ hr+div.overlapped
   counter-increment: h3-number;
   font-family: inherit; font-size: 0.87em; font-weight: bold;
   content: counter(h3-number) ". ";
+}
+
+
+/* Styling for Frequently Asked Questions
+ * ======================================
+ * Display questions on buttons, which will initiate display
+ * of respective answers immediately below, when clicked.
+ */
+div.faq button
+{ display: block; width: 100%; outline: none; cursor: pointer;
+  border: none; padding: 1pt 5px 0 25px; background-color: inherit;
+  text-align: justify; font: 14pt Roboto; color: #000066;
+}
+div.faq h3 + button
+{ margin-top: 0.6em;
+}
+div.faq button::before
+{ float: left; margin-left: -25px; width: 23px; content: "Q.";
+  text-align: center; font: bolder 12pt Roboto; padding-top: 2pt;
+}
+div.faq button:hover
+{ background-color: #dcdcfc;
+}
+div.faq button.open,
+div.faq button.open + div.answer
+{ background-color: #d9d9fc;
+}
+div.faq div.answer
+{ display: none; /* margin-left: -5px; */ min-height: 1em;
+  padding: 1.5pt 5px 0 25px;
+}
+div.faq div.answer::before
+{ float: left; margin-left: -25px; width: 23px; content: "A.";
+  text-align: center; font: bolder 12pt Roboto; padding-top: 2pt;
+}
+div.faq div.answer p:first-child
+{ margin-top: 0;
+}
+div.faq div.answer p
+{ margin-top: 3pt;
+}
+div.faq button + button,
+div.faq div.answer + button
+{ margin-top: 0.25em;
 }
 
 

@@ -1,0 +1,549 @@
+<!DOCTYPE HTML><!--
+ *
+ * faq.html
+ *
+ * MinGW.OSDN frequently asked questions.
+ *
+ *
+ * $Id$
+ *
+ * Written by Keith Marshall <keith@users.osdn.me>
+ * Copyright (C) 2021, MinGW.OSDN Project
+ *
+ *
+ * Redistribution and use in source and 'compiled' forms (SGML, HTML,
+ * PDF, PostScript, RTF, etc) with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer as
+ *    the first lines of this file, unmodified.
+ *
+ * 2. Redistributions in compiled form (transformed to other DTDs,
+ *    converted to PDF, PostScript, RTF and other formats) must
+ *    reproduce the above copyright notice, this list of conditions
+ *    and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS DOCUMENTATION IS PROVIDED BY THE MINGW.OSDN PROJECT "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE MINGW.OSDN PROJECT, OR
+ * ITS CONTRIBUTORS, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ *
+ *
+ * Note: this page assumes browser support for the following numeric
+ * HTML entity codes:
+ *
+ *    &#8209;   non-breaking hyphen
+ *    &#8216;   typographic left (opening) single quote
+ *    &#8217;   typographic apostrophe/right (closing) single quote
+ *    &#8220;   typographic left (opening) double quote
+ *    &#8221;   typographic right (closing) double quote
+ *
+-->
+<script class="masthead">
+ set_page( "title", "MinGW.OSDN Frequently Asked Questions" );
+ var group = 0, questions = document.getElementsByClassName( "faq" );
+
+ function show_answer( item, view )
+ { if( (item = item.nextElementSibling).classList.contains( "answer" ) )
+     item.style.display = view ? "block" : "none";
+ }
+ while( group < questions.length )
+ { var entry, query = questions[group++].getElementsByTagName( "button" );
+   for( entry = 0; entry < query.length; entry++ )
+   { query[entry].onclick = function()
+     { show_answer( this, this.classList.toggle( "open" ) ); }
+   }
+ }
+</script><!-- masthead -->
+<p>This document presents a categorized list of questions,
+and answers, relating to the MinGW.OSDN software distributions,
+and their use.
+</p>
+<p>The answer to each question may be revealed,
+immediately below it, by clicking on the question itself.
+In the case of questions for which the answer is already visible,
+a further click on the question will dismiss the view of the answer.
+</p>
+<div style="display: none">
+<!-- template -~- copy & paste next 6 lines to create a Q&A container -->
+<button>?</button>
+<div class="answer">
+<p>
+</p>
+</div><!-- answer -->
+</div><!-- template -->
+<div class="overlapped faq" id="general">
+<h3>General Enquiries</h3>
+<button>What is MinGW?</button>
+<div class="answer">
+<p>Created by Colin Peters,
+and released to the public domain,
+the original MinGW &mdash; or &#8220;Minimalist GNU for Windows&#8221;
+&mdash; was a system of import libraries, header files, and supporting
+&#8220;glue&#8221; code, to facilitate the use of Microsoft&#8217;s
+<code>CRTDLL.DLL</code> &mdash; and later <code>MSVCRT.DLL</code> &mdash;
+as the primary run&#8209;time support for a native MS&#8209;Windows port
+of the GNU Compiler Collection (GCC), and its supporting utilities,
+(which, in turn, were originally provided by Jan&#8209;Jaap van der Heijden).
+</p>
+<p>Today, MinGW has become synonymous with the entire system comprising
+these GNU tools, a significantly extended derivative of Colin&#8217;s
+original run&#8209;time system, together with complementary import libraries,
+and headers, to facilitate access to the MS&#8209;Windows&nbsp;API, a further
+collection of complementary libraries, and utilities, and even the native
+MS&#8209;Windows environment in which they run, providing a complete
+Open&nbsp;Source programming tool set which is suitable for the development
+of native MS&#8209;Windows applications, with no implicit dependency on any
+3rd&#8209;party C&#8209;Runtime DLL.
+</p>
+</div><!-- answer -->
+<button>What is MSYS?</button>
+<div class="answer">
+<p>A contraction of &#8220;Minimal SYStem&#8221;,
+originally conceived by Earnie Boyd, and implemented as
+a light&#8209;weight fork of Cygwin&#8209;1.3,
+MSYS is a Bourne shell command line interpreter system
+for use on the MS&#8209;Windows platform.
+Offered as a general purpose alternative to Microsoft&#8217;s
+<code>cmd.exe</code>, it is accompanied by a small selection
+of Unix tools, making it particularly suitable,
+in conjunction with MinGW,
+for porting of many Open Source applications
+to the MS&#8209;Windows plarform.
+</p>
+</div><!-- answer -->
+<button>What is W32API?</button>
+<div class="answer">
+<p>Created by Anders Norlander,
+<code>w32api</code> is a system of import libaries, and header files,
+complementing Colin Peters&#8217; original bindings for Microsoft&#8217;s
+<code>CRTDLL.DLL</code>, by the addition of bindings for Microsoft&#8217;s
+32&#8209;bit &#8220;Windows Application Programming Interface&#8221;.
+</p>
+</div><!-- answer -->
+<button>What is the &#8220;mingw&#8209;ports&#8221; framework?</button>
+<div class="answer">
+<p>Originally conceived by Earnie Boyd,
+and promoted under the name &#8220;<code>mingwPORT</code>&#8221;,
+this is a system of Bourne shell scripts, designed to facilitate
+building of MinGW applications, by end users, directly from the
+upstream source code.
+</p>
+<p>Unfortunately, as originally conceived,
+the <code>mingwPORT</code> system exhibited a number of flaws.
+In recognition of this, Charles (Chuck) Wilson, developed a replacement,
+derived from Cygwin&#8217;s &#8220;<code>cygport</code>&#8221; system,
+which he called &#8220;<code>mgwport</code>&#8221;.
+This, in turn, was found to be rather unsatisfactory,
+and has since been supplanted by the
+&#8220;<code>mingw-port</code>&#8221; subsidiary of
+&#8220;<a rel="noopener noreferrer" target="_blank"
+ href="https://osdn.net/users/keith/pf/mingw.pkg/"
+>the <code>mingw&#8209;pkg</code> system</a>&#8221;.
+</p>
+<p>A list of packages, which are currently
+distributed via the <code>mingw&#8209;ports</code> framework,
+may be found within <a rel="noopener noreferrer" target="_blank"
+ href="https://osdn.net/projects/mingw/storage/mingw-ports"
+>the MinGW File Release System</a>.
+</p>
+</div><!-- answer -->
+<button>How can I get help, if I can&#8217;t find an answer here?</button>
+<div class="answer">
+<p>Presumably,
+you have exhausted all resources on this web&#8209;site,
+<em>and</em>&hairsp; a search of <em>all</em>&hairsp;
+of the MinGW mailing&#8209;list archives,
+(both current,
+<em>and</em>&hairsp; historical),
+and you have found
+nothing pertinent to your problem.
+You <em>may</em>&hairsp; find an answer
+on some 3rd&#8209;party web&#8209;site;
+however,
+<em>caveat emptor</em>&hairsp;: such web&#8209;sites are often
+sources of ill&#8209;advised,
+and even <em>downright wrong</em>&hairsp;,
+information!
+Instead,
+we <em>strongly</em>&hairsp; recommend that
+you <em>subscribe</em>&hairsp; to the
+<a target="_blank" href="index.html?page=mailing.html#mingw-users"
+>MinGW&#8209;Users mailing list</a>,
+post a message explaining your problem,
+and ask for advice.
+</p>
+</div><!-- answer -->
+<button>Why do I receive persistent rejection notifications,
+when I attempt to post messages to the MinGW&#8209;Users mailing list?
+</button>
+<div class="answer">
+<p>To protect the list, and its subscribers,
+from a proliferation of <em>spam</em>&hairsp;, the
+<a target="_blank" href="index.html?page=mailing.html#mingw-users"
+>MinGW&#8209;Users mailing list</a> will reject any messages
+which are posted by non&#8209;subscribers;
+thus, to avoid the rejection notifications, you <em>must</em>&hairsp;
+<a rel="noopener noreferrer" target="_blank"
+ href="https://lists.osdn.me/mailman/listinfo/mingw-users"
+>subscribe</a>, and you <em>must</em>&hairsp; post <em>only</em>&hairsp;
+from your subscribed address.
+</p>
+</div><!-- answer -->
+<button>I <em>have</em>&hairsp;
+subscribed to the MinGW&#8209;Users mailing list;
+why do I continue to receive rejection notifications,
+when I post messages?
+</button>
+<div class="answer">
+<p>You may not have fully completed the subscription process.
+After submitting the <a rel="noopener noreferrer" target="_blank"
+ href="https://lists.osdn.me/mailman/listinfo/mingw-users"
+>subscription request form</a>, you will receive a confirmation request,
+(via e&#8209;mail to the address for which you requested your subscription).
+You <em>must</em>&hairsp; respond to this confirmation request,
+following the instructions contained therein;
+until you do so, your subscription will <em>not</em>&hairsp; become active.
+</p>
+<p>If you did not receive a confirmation request,
+then please check that your e&#8209;mail client, or your service provider,
+has not directed it into your junk folder, (or any other folder which you
+may not habitually monitor).
+</p>
+<p>If you believe that you <em>have</em>&hairsp;
+completed the subscription process,
+then please double check that the address from which you are trying to post
+<em>exactly</em>&hairsp; matches that which you subscribed.
+You may wish to use the auto&#8209;responding
+<a href="mailto:mingw-users-request@lists.osdn.me?subject=password"
+>password reminder request</a>, and/or
+<a href="mailto:mingw-users-request@lists.osdn.me?subject=help"
+>subscription help request</a> services to verify the status
+of your subscription; if you submit a request of each type,
+in this order, and you receive a response to the help request,
+but you do not receive a password reminder,
+then there is no active subscription for your address.
+</p>
+<p>If a password reminder request <em>does</em>&hairsp; elicit a reply,
+but you still receive rejection notifications when you post to the list,
+then you may have a legitimate justification to
+<a href="mailto:mingw-users-owner@lists.osdn.me"
+>seek administrative assistance</a>.
+</p>
+</div><!-- answer -->
+<button>Can I use the administrative address
+to communicate with the MinGW Developers?
+</button>
+<div class="answer">
+<p><em>Absolutely not</em>&hairsp;!
+The administrative address is <em>strictly</em>&hairsp; reserved for
+administrative communications; if you attempt to abuse it for
+any other purpose, you will receive no reply.
+</p>
+</div><!-- answer -->
+<button>If I cannot use the administrative address,
+what mechanism <em>is</em>&hairsp; available for direct communication
+with the MinGW Developers?
+</button>
+<div class="answer">
+<p>You should subscribe, and post a message to the
+<a target="_blank" href="index.html?page=mailing.html#mingw-users"
+>MinGW&#8209;Users mailing list</a>.
+If one of the developers decides that your enquiry merits his,
+or her attention, he, or she will reply.
+Any such reply may, or may not, initiate an off&#8209;list dialogue;
+whether it does so, or not, is at the discretion of the developer;
+<em>you</em>&hairsp; have no right to,
+nor should you have any expectation of,
+such preferential attention.
+</p>
+</div><!-- answer -->
+<button>Is there a release schedule for MinGW software packages?
+If there is, where can I find it?
+</button>
+<div class="answer">
+<p>There is no formal release schedule.
+MinGW is developed, and maintained, by a very few unpaid volunteers.
+Each contributing volunteer will publish updated versions of the packages
+which they maintain,
+on an <em>ad hoc</em>&hairsp; basis, as and when they are ready.
+Attempting to impose a strict schedule will only engender frustration,
+and will be counterproductive.
+</p>
+<p>The next release, of whatever package you are waiting for,
+will be published when it is ready; if you want it sooner,
+please feel free to contribute to the effort of getting it ready.
+</p>
+</div><!-- answer -->
+</div><!-- faq -->
+<div class="overlapped faq" id="compiling">
+<h3>Compiling and Linking Issues</h3>
+<button>Why can&#8217;t the MinGW compilers find my project&#8217;s
+header files?
+</button>
+<div class="answer">
+<p>Unless your project&#8217; header files are placed in directories
+which are already in the compiler&#8217;s default &#8220;include file
+search path&#8221;, <em>you</em>&hairsp; must specify compiler options,
+such as &#8220;<code>-I</code>&nbsp;<code><em>path</em></code>&thinsp;&#8221;,
+&#8220;<code>-iquote</code>&nbsp;<code><em>path</em></code>&thinsp;&#8221;, or
+&#8220;<code>-isystem</code>&nbsp;<code><em>path</em></code>&thinsp;&#8221;,
+to indicate where your header files may be found.
+</p>
+<p>A comprehensive discussion of this issue, and potential solutions,
+may be found in <a target="_blank" href="index.html?page=isystem.html"
+>this MinGW user guide</a>.
+</p>
+</div><!-- answer -->
+<button>How do I specify the libraries to be searched by the MinGW linker?
+</button>
+<div class="answer">
+<p>Assuming that your libraries are correctly named,
+according to one of the conventions described in
+<a target="_blank" href="index.html?page=libspec.html"
+>this user guide</a>, you should add references of the form
+&#8220;<code>-l<em>name</em></code>&thinsp;&#8221; for each required library,
+ensuring that each such reference is placed <em>after</em>&hairsp;
+all named source and object files which refer to it,
+<em>and</em>&hairsp;, if any library refers to another,
+that the <em>referring</em>&hairsp; library is named <em>before</em>&hairsp;
+any to which it refers; (note: in the event of circular
+references among libraries &mdash; a design fault &mdash;
+this may require some libraries to be named more than once).
+</p>
+<p>Moreover, if any named library cannot be found in the
+linker&#8217;s default search path, you may also need to specify
+&#8220;<code>-L</code>&nbsp;<code><em>path</em></code>&thinsp;&#8221;
+options, as advised in
+<a target="_blank" href="index.html?page=libpath.html"
+>this additional user guide</a>.
+</p>
+</div><!-- answer -->
+<button>Why does the MinGW linker
+persistently report &#8220;undefined reference&#8221; errors,
+when I have specified all of the libraries
+which are required to link my application?
+</button>
+<div class="answer">
+<p>There are several reasons why the linker may report
+&#8220;undefined reference&#8221; errors.
+Typically, you may be attempting to use a system function,
+which simply isn&#8217;t natively supported on MS&#8209;Windows,
+(and thus, is <em>not</em>&hairsp; provided within any MinGW system library);
+alternatively, you may have neglected to specify some library,
+which is needed to provide the missing functionality.
+</p>
+<p>If you are certain that neither of these is the problem,
+then it is likely that you are falling foul of a common issue,
+which is most often entirely attributable to user error:
+the GNU linker (and hence, the MinGW linker)
+is a <em>single pass</em>&hairsp; linker, and thus,
+successful linking is <em>crucially dependent</em>&hairsp; on
+the order in which source files, object modules,
+and library references are specified,
+on the command line;
+unfortunately,
+and all too frequently,
+many <em>users</em>&hairsp; seem to get this <em>fatally wrong</em>&hairsp;.
+You <em>must</em>&hairsp; ensure that <em>every</em>&hairsp; library reference
+is placed <em>after</em>&hairsp; every specified object module,
+(whether explicitly specified, or implicitly compiled),
+which depends on it.
+</p>
+</div><!-- answer -->
+<button>Why does a compile and link command,
+which works fine on GNU/Linux,
+report &#8220;undefined reference&#8221; errors,
+when invoked <em>identically</em>&hairsp; on MinGW?
+</button>
+<div class="answer">
+<p>Assuming that
+all of the unresolved references can actually be satisfied,
+from the set of libraries which have been specified,
+this is almost certainly another manifestation
+of the same user error as identified in the previous answer.
+The order in which sources, object files, and libraries
+are specified, on the command line, may be incorrect,
+<em>both</em>&hairsp; for MinGW, <em>and</em>&hairsp; for GNU/Linux;
+however, the ELF version of the GNU linker,
+as used on GNU/Linux, may forgive unresolved references,
+in the particular case of symbols which are defined
+in a prematurely&#8209;specified <em>shared</em>&hairsp; library,
+whereas MinGW&#8217;s PE&#8209;COFF linker will <em>not</em>&hairsp;
+forgive this.
+</p>
+<p>That&#8217;s just the way it is.
+Technically, this is as much an error for the GNU/Linux case,
+as it is for MinGW; we recommend that you <em>should</em>&hairsp;
+correct the errant GNU/Linux usage; you <em>must</em>&hairsp;
+correct it for MinGW.
+</p>
+</div><!-- answer -->
+<button>My application compiles, and links fine,
+but the executable is <em>huge</em>&hairsp;; why is this?
+</button>
+<div class="answer">
+<p>The most common reason,
+for executables being larger than expected,
+is that they include <em>debugging information</em>&hairsp;;
+(this is added when object modules are compiled with GCC&#8217;s
+&#8216;<code>&#8209;g</code>&#8217; option).
+Even if you do not use &#8216;<code>&#8209;g</code>&#8217;,
+when compiling your own code,
+some of the libraries with which you link,
+(including system libraries distributed by MinGW.OSDN),
+may incorporate debugging information,
+and this can have a significant effect
+on the size of executables.
+</p>
+<p>If the size of your executables is inflated by debugging information,
+you may use the <code>strip</code> command to remove it;
+alternatively, you may specify GCC&#8217;s &#8216;<code>&#8209;s</code>&#8217;
+option, when you link the executables, to achieve the same effect.
+</p>
+<p>Other factors,
+which may contribute to inflation of the size of executables,
+and the techniques which may be employed to mitigate them,
+are discussed in the user guide:
+<a target="_blank" href="index.html?page=exesize.html"
+>HOWTO Reduce the Size of MinGW Executable Files</a>.
+</p>
+</div><!-- answer -->
+<button>Why does a recompiled executable differ from the original,
+when I haven&#8217;t changed the source, or any compiler options?
+</button>
+<div class="answer">
+<p>The <em>run&#8209;time behaviours</em>&hairsp; of
+the two executables should be identical.
+However, the MinGW GCC compiler <em>does not</em>&hairsp; guarantee
+to produce consistent output, between any two compilations of the
+same source; differences in recorded meta&#8209;data, (e.g.
+compilation date), will be sufficient to introduce byte&#8209;level
+diferences; furthermore, there is no guarantee that the ordering
+of the generated code will remain identical.
+</p>
+<p>It may be possible to achieve consistent output,
+by patching GCC itself, but doing so is beyond the scope
+of MinGW&#8217;s documentation.
+</p>
+</div><!-- answer -->
+<button>What should I do when the compiler reports an
+&#8220;internal error&#8221;?
+</button>
+<div class="answer">
+<p>If you see a diagnostic message similar to this:
+</p><pre class="box-out">
+../include/wx/ctrlsub.h:156: internal error: Segmentation fault
+</pre><p>then try running the same compilation command again.
+</p>
+<p>If the same error message is reproduced,
+then you may have stumbled upon a genuine compiler defect.
+You should try to create a <em>minimal reproducible test case</em>&hairsp;,
+(i.e.&nbsp;an <a rel="noopener noreferrer" target="_blank"
+ href="http://www.sscce.org"
+>SSCCE</a>), and post it, along with a request for advice, on the
+<a target="_blank" href="index.html?page=mailing.html#mingw-users"
+>MinGW&#8209;Users mailing list</a>;
+others may have already encountered the same problem,
+and be able to help.
+</p>
+<p>Conversely,
+if the error is <em>not consistently reproducible</em>&hairsp;,
+you may have a hardware fault;
+<a rel="noopener noreferrer" target="_blank"
+ href="https://www.bitwizard.nl/sig11/"
+>this third&#8209;party FAQ</a> may help to explain the issue.
+</p>
+<p>As a work&#8209;around,
+if you have encountered a <em>persistently reproducible</em>&hairsp;
+<dfn>ICE</dfn> (internal compiler error), then you may be able
+to circumvent it by recompiling at a different (likely lower)
+level of optimization; (however, you should not allow this,
+if successful, to discourage you from reporting the issue).
+</p>
+</div><!-- answer -->
+</div><!-- faq -->
+<div class="overlapped faq" id="portability">
+<h3>Software Portability Issues</h3>
+<button>Can I use libraries compiled by other compilers,
+(e.g. MSVC), with MinGW?
+</button>
+<div class="answer">
+<p>This depends on the interfaces exposed by the library.
+In general, any interface which is exposed using
+<code>extern</code>&nbsp;<code>&quot;C&quot;</code>
+linkage, (as is the case for many of the MS&#8209;Windows&nbsp;API
+library function interfaces), will be compatible; on the other hand,
+interfaces which are exposed using <code>C++</code> linkage,
+(or any other language linkage protocol,
+which is not <em>strictly</em>&hairsp;
+<code>extern</code>&nbsp;<code>&quot;C&quot;</code> compatible),
+are unlikely to be usable.
+</p>
+</div><!-- answer -->
+<button>MinGW&#8217;s <code>printf()</code> doesn&#8217;t seem
+to support the C99 <code>%ll</code> format modifier; how can I format
+a C99 <code>long</code>&nbsp;<code>long</code> value?
+</button>
+<div class="answer">
+<p>MinGW&#8217;s <code>printf()</code> <em>does</em>&hairsp; support
+the <code>%ll</code> format modifier; however, Microsoft&#8217;s
+<code>MSVCRT.DLL</code> implementation, (which is what MinGW uses
+<em>by default</em>&hairsp;), does not.
+</p>
+<p>If you want to continue to use the <code>MSVCRT.DLL</code>
+implementation of <code>printf()</code>, then to format a C99
+<code>long</code>&nbsp;<code>long</code> value, you must use
+Microsoft&#8217;s <em>non&#8209;standard</em>&hairsp; <code>I64</code>
+format modifier, instead of the standard C99 <code>%ll</code> modifier.
+</p>
+<p>Conversely, if you prefer C99 standard <code>printf()</code>
+compatibility, then you <em>must</em>&hairsp; elect to use the
+<code>libmingwrt.a</code> implementation of <code>printf()</code>,
+(and its formatted I/O siblings), when you compile your code;
+<em>any one</em>&hairsp; of the following
+<em>formally sanctioned</em>&hairsp;
+techniques is sufficient to achieve this:
+</p><ul style="margin-left: -0.8em">
+<li>Compile your code with GCC&#8217;s <code>-posix</code> option.
+</li>
+<li>Permanently <em>enable</em>&hairsp; the <code>__MINGW_ANSI_STDIO__</code>
+feature, by editing MinGW&#8217;s <code>&lt;features.h&gt;</code> file;
+(supported from <code>libmingwrt.a</code> version 5.2.1 onwards).
+</li>
+<li><code>#define</code> either <code>_GNU_SOURCE</code>, or
+<code>_BSD_SOURCE</code>, <em>before</em>&hairsp; any <code>#include</code>
+statement, which may cause any system header file to be included;
+(neither macro requires an associated value).
+</li>
+<li><code>#define</code>&nbsp;<code>_POSIX_C_SOURCE</code>, with
+any of the non&#8209;zero values specified by the POSIX standard;
+if unspecified, at the time when the first <code>#include</code>
+statement, if any, which causes any system header file to be
+included, MinGW will <em>implicitly</em>&hairsp; behave as if a value
+of <code>200809L</code> had been specified, but an <em>explicit</em>&hairsp;
+definition is required, to override the <code>MSVCRT.DLL</code>
+implementation of <code>printf()</code>.
+</li>
+<li><code>#define</code>&nbsp;<code>_XOPEN_SOURCE</code>, with any
+of the values prescribed by the POSIX standard; once again, such a
+definition <em>must</em>&hairsp; precede <em>all</em>&hairsp;
+<code>#include</code> statements which may cause inclusion of
+any system header file; it has the same effect as an <em>explicit</em>&hairsp;
+definition of <code>_POSIX_C_SOURCE</code>,
+at the equivalent conformity level.
+</li></ul>
+</div><!-- answer -->
+</div><!-- faq -->
+
+<!-- $RCSfile$: end of file -->
