@@ -62,11 +62,17 @@ h3
    */
   margin-bottom: -0.2em;
 }
+h4
+{ margin: 0.8em 0 -0.2em;
+}
 hr
 { /* Match the colour of horizontal page dividing rules to that
    * of the text.
    */
   color: #000066;
+}
+.nowrap
+{ white-space: nowrap;
 }
 a
 { /* Links are distiguisable by use of a contrasting text colour;
@@ -79,6 +85,13 @@ a:visited
    * alternative contrasting text colour.
    */
   color: #aa00cc;
+}
+a code
+{ /* Whereas code samples, within running text, are displayed in a
+   * reduced-intensity colour, when encapsulated within a reference
+   * anchor, the anchor colour should prevail.
+   */
+  color: inherit;
 }
 p
 { /* Use the browser's default paragraph styling, but tighten the
@@ -112,6 +125,18 @@ ul li, ol li
 ul li:first-child, ol li:first-child
 { margin-top: 0;
 }
+ul.overlapped
+{ margin-left: -0.6em; margin-bottom: 0; padding-top: calc( 70px + 0.6em );
+}
+ul.overlapped li > p:last-child
+{ margin-bottom: 0;
+}
+li > p
+{ /* For multi-paragraph list items, keep the paragraph
+   * spacing tighter than for free-standing paragraphs.
+   */
+  margin-top: 0.12em; margin-bottom: 0.3em;
+}
 dl dt
 { /* Similarly, set explicit layout rules for definition lists.
    */
@@ -128,6 +153,23 @@ dl.no-indent dd
    * definition list of the "no-indent" class.
    */
   margin-left: 0;
+}
+dl.hanging-indent
+{ /* An alternative definitions list style, placing the term
+   * within a 7.5% width "hanging indent", vertically aligned
+   * with the definition occupying the remaining 92.5% of the
+   * page width.
+   */
+  margin: 0.6em 0 0 0;
+}
+dl.hanging-indent dt
+{ float: left; width: 7.5%; margin: 0; padding: 0;
+}
+dl.hanging-indent dd
+{ width: 92.5%; margin: 0; padding: 0 0 0.5em 7.5%;
+}
+dl.hanging-indent dd:last-child
+{ padding-bottom: 0;
 }
 
 
@@ -226,7 +268,7 @@ dl.toc dt
    * space for the fixed page header; (it may subsequently scroll,
    * to be occluded behind the header).
    */
-  position: absolute; top: 70px;
+  position: absolute; top: 70px; min-width: 94%;
   text-align: justify; padding: 0 3% 1.5em;
 }
 .masthead
@@ -250,14 +292,6 @@ dl.toc dt
    */
   margin: 0; padding-top: 1px; font-weight: normal;
 }
-dl.masthead
-{ /* On page overlays, we use a definition list to specify the
-   * page title, and subtitle, which are to be propagated to the
-   * masthead section within the page content; the content of the
-   * definition list, itself, should not be directly visible.
-   */
-  display: none;
-}
 .masthead+p
 { /* The masthead section is separated from the remaining page
    * content, by a horizontal rule; to keep white space balanced,
@@ -266,6 +300,14 @@ dl.masthead
    * explicitly adjust the paragraph margin.
    */
   margin-top: 1.3em;
+}
+.masthead+div.overlapped
+{ /* When an overlapped div element is placed immediately below
+   * the masthead, we need to pull its content slightly closer to
+   * the top of the viewport, than we do for overlapped content
+   * which appears further down the page.
+   */
+  margin-top: calc( -70px - 0.4em );
 }
 
 
@@ -356,6 +398,87 @@ div.faq button + button,
 div.faq div.answer + button
 { margin-top: 0.25em;
 }
+
+
+/* Styling for "Box-Out" Content
+ * =============================
+ * Suitable for display of any "aside" content, but applicable,
+ * in particular, to pre-formatted code samples, and examples in
+ * a "video-terminal" view style.
+ */
+.box-out
+{ /* Identify the "box-out" region, by drawing a solid border,
+   * and lightening the background colour.
+   */
+  margin: 0.2em 0; border: 1px solid #003366; background-color: #f3f3ff;
+  padding: 0.3em 0.6em; border-radius: 7px;
+}
+div.box-out
+{ /* When a box-out is designated as a container for regular text,
+   * rather than for preformatted content, adjust its text size to
+   * appear slightly larger than adjacent running text...
+   */
+  font-size: 1.025em;
+}
+div.box-out p:first-child
+{ /* ...and avoid a excessive gap between the top of the bounding
+   * box, and the initial internal paragraph.
+   */
+  margin-top: 0;
+}
+pre.vt, code
+{ /* Use a lighter text colour, to highlight code samples in
+   * running text, and the machine-output in "video-terminal"
+   * style displays...
+   */
+  color: #666699;
+}
+pre.vt kbd
+{ /* ...while emboldening, and darkening, the representation
+   * of user input, in those same "video-terminal" displays.
+   */
+  font-weight: bold; color: #003366;
+}
+p+pre.box-out, pre.box-out+p
+{ /* Keep balanced vertical spacing around pre-formatted box-out
+   * regions, when placed between two conventional paragraphs.
+   */
+  margin-top: 0.5em;
+}
+div.box-out dl.hanging-indent dt
+{ /* A variation on the "hanging indent" definitions list style,
+   * for use within "box-out" content.
+   */
+  width: 7%; font-style: italic;
+}
+div.box-out dl.hanging-indent dd:last-child
+{ padding-bottom: 0;
+}
+div.box-out dl.hanging-indent dd
+{ padding: 0 0 0.2em 7%;
+}
+
+
+/* Layout for Tables, Omitting Cell Boundary Lines
+ * ===============================================
+ */
+table.borderless
+{ border: none; border-spacing: 1em 0;
+}
+table.borderless th
+{ border-bottom: 2px solid #000066;
+}
+table.borderless tr.leaded td
+{ padding-top: 0.3em;
+}
+table.borderless code
+{ color: inherit;
+}
+table.top-aligned tr td, table.top-aligned tr tr
+{ vertical-align: top;
+}
+
+p + table.borderless { margin: 0.3em -0.2em; }
 
 
 /* Styling for In-Line Web-Search Form Fields
