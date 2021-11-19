@@ -1,0 +1,429 @@
+<!DOCTYPE HTML><!--
+ *
+ * buginfo.html
+ *
+ * Information and guidance to assist users in submission of
+ * bug reports.
+ *
+ *
+ * $Id$
+ *
+ * Written by Keith Marshall <keith@users.osdn.me>
+ * Copyright (C) 2020, 2021, MinGW.OSDN Project
+ *
+ *
+ * Redistribution and use in source and 'compiled' forms (SGML, HTML,
+ * PDF, PostScript, RTF, etc) with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer as
+ *    the first lines of this file, unmodified.
+ *
+ * 2. Redistributions in compiled form (transformed to other DTDs,
+ *    converted to PDF, PostScript, RTF and other formats) must
+ *    reproduce the above copyright notice, this list of conditions
+ *    and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS DOCUMENTATION IS PROVIDED BY THE MINGW.OSDN PROJECT "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE MINGW.OSDN PROJECT, OR
+ * ITS CONTRIBUTORS, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ *
+ *
+ * Note: this page assumes browser support for the following numeric
+ * HTML entity codes:
+ *
+ *    &#8209;   non-breaking hyphen
+ *    &#8216;   typographic left (opening) single quote
+ *    &#8217;   typographic apostrophe/right (closing) single quote
+ *    &#8220;   typographic left (opening) double quote
+ *    &#8221;   typographic right (closing) double quote
+ *
+-->
+<script class="masthead">
+/* Script fragment, to assign titles specific to this page; this is
+ * encapsulated within the "masthead", where such titles are displayed,
+ * to ensure that whatever page content may follow will be correctly
+ * positioned, relative to the masthead content.
+ */
+ set_page("title", "Reporting Bugs");
+ set_page("subtitle", "HOWTO Submit an Effective MinGW Bug Report");
+</script><!-- masthead -->
+<p>So you think you have found a bug and would like to report the problem?
+Before reporting a bug please ensure you have applied all applicable updates
+to your build environment, and also search the <a target="_blank"
+ href="index.html?page=mailing.html#mingw-users"
+>MinGW.OSDN mail archives</a>, and the <a rel="noopener noreferrer"
+ target="_blank" href="https://osdn.net/projects/mingw/ticket/"
+>MinGW.OSDN &#8220;Issues&#8221; ticket system</a>,
+to ensure the bug has not already been reported,
+or if a temporary workaround has been suggested.
+(When searching within the ticket system,
+please ensure that you include &#8220;Closed&#8221; tickets;
+it may be that a solution is already available,
+pending a future release).
+</p>
+<p>To ensure that your report will be given the utmost attention,
+please read and follow <a href="#guidelines">the guidelines below</a>.
+These are provided for your benefit,
+as non&#8209;compliance may result in rejection of your bug report.
+Although they apply, in this specific context,
+to reporting via <a rel="noopener noreferrer"
+ target="_blank" href="https://osdn.net/projects/mingw/ticket/"
+>the MinGW.OSDN ticket system</a>,
+these recommendations are typical of any bug reporting process.
+</p>
+
+<div class="overlapped" id="guidelines">
+<h3>Guidelines for Submission of Bug Reports</h3>
+<p>For general guidance on <em>How to Report Bugs Effectively</em>,
+you are encouraged to read <a rel="noopener noreferrer" target="_blank"
+ href="http://www.chiark.greenend.org.uk/~sgtatham/bugs.html"
+>this treatise by Simon Tatham</a>.
+Do note, however, that to report MinGW bugs,
+you should use the reporting facilities documented below;
+<strong>do not</strong> report MinGW bugs to Simon &mdash;
+he is unlikely to be interested.
+</p>
+<p>When reporting a bug to one of the
+<a target="_blank" href="index.html?page=mailing.html#mingw-users"
+>MinGW mailing lists</a>
+or to the <a rel="noopener noreferrer" target="_blank"
+ href="https://osdn.net/projects/mingw/ticket/"
+>MinGW Issues ticket system on OSDN.net</a>,
+please include as much as possible of the following information,
+pertinent to the problem:
+</p>
+
+<ul class="overlapped" id="host-info">
+<li><strong>Host Operating System Information and Version</strong>
+<p>Your build environment will probably not be the same as our defaults,
+so it will helpful if you give us some information about your setup;
+in particular, please specify which version of Windows you are using,
+be it Windows&#8209;95, Windows&#8209;98, Windows&#8209;ME, Windows&#8209;NT,
+Windows&#8209;2000, Windows&#8209;XP, Windows&#8209;Vista, Windows&#8209;7,
+Windows&#8209;8, Windows&#8209;8.1, or Windows&#8209;10;
+alternatively,
+if you are using a MinGW&#8209;compatible cross&#8209;compiler suite,
+please provide details of the system on which you are running it.
+</p>
+<p>If you are working on a native MS&#8209;Windows host,
+please tell us whether you are running the compiler suite from
+Microsoft&#8217;s <code>cmd.exe</code>,
+or if you are using a Bourne shell environment,
+such as <strong>MSYS</strong>, or <strong>Cygwin</strong>.
+(Do please note that modern Cygwin is effectively equivalent to
+the use of a cross&#8209;compiler suite, on a non&#8209;Windows host;
+very old Cygwin versions exhibit behavioural similarities to MSYS,
+but if you are still using one of these &mdash; characterized by use of
+the &#8216;<code>gcc -mno-cygwin ...</code>&#8217; command to enter
+MinGW compilation mode &mdash; you should <em>definitely</em>
+seek to upgrade).
+</p>
+<p>If you are using the MSYS Bourne shell,
+please show us the the output produced by running the command:
+</p>
+<pre class="box-out vt">$ <kbd>uname -a</kbd></pre>
+<p>Furthermore,
+if you are using RXVT as the container in which to run the MSYS shell,
+then please confirm that the bug is also present if you run the shell
+in a <em>native</em> MS&#8209;Windows console,
+(i.e.&nbsp;by starting MSYS with the <code>-norxvt</code> option,
+or by moving <code>rxvt.exe</code> out of the way,
+before starting MSYS).
+</p></li>
+</ul><!-- host-info -->
+
+<ul class="overlapped" id="gcc-info">
+<li><strong>GCC Version and Configuration</strong>
+<p>If you are using a MinGW&#8209;GCC compiler suite,
+running on a native MS&#8209;Windows host system,
+the GCC compiler version, and configuration,
+can be determined by running the following command
+(either from Microsoft&#8217;s <code>cmd.exe</code> prompt,
+or from an MSYS Bourne shell prompt):
+</p>
+<pre class="box-out vt">$ <kbd>gcc -v</kbd></pre>
+<p>If you are using a MinGW&#8209;compatible cross&#8209;compiler,
+the command is effectively the same, but with &#8216;<code>gcc</code>&#8217;
+qualified by the appropriate host prefix;
+e.g.&nbsp;if your cross&#8209;compiler is characterized by
+the &#8216;<code>mingw32</code>&#8217; host prefix,
+you would invoke the equivalent of the preceding command as:
+<pre class="box-out vt">$ <kbd>mingw32-gcc -v</kbd></pre>
+<p>Regardless of which form you use to invoke it,
+the output from the preceding command will tell us
+which version of GCC you are using,
+whether it is operating on the basis of built&#8209;in &#8216;specs&#8217;,
+or it is using an external &#8216;specs&#8217; file,
+(of which you should provide a copy),
+and the options with which GCC was configured.
+Please post the output from this command in its entirety,
+(i.e.&nbsp;copy&#8209;and&#8209;paste it);
+<em><strong>do not</strong></em> trim,
+or exclude any part of it.
+</p></li>
+</ul><!-- gcc-info -->
+
+<ul class="overlapped" id="binutils-info">
+<li><strong>GNU Binutils Version</strong>
+<p>The GNU binutils suite is a prerequisite of the GCC compiler suite,
+(providing the assembler, and linker, among other utilities).
+The installed version <em>must</em> be consistent with the GCC requirement;
+you may verify this by running the linker command:
+</p>
+<pre class="box-out vt">$ <kbd>ld -v</kbd></pre>
+<p>or the cross&#8209;compiler equivalent, (once again,
+assuming a host prefix of &#8216;<code>mingw32</code>&#8217;):
+</p>
+<pre class="box-out vt">$ <kbd>mingw32-ld -v</kbd></pre>
+<p>As in the case of GCC version identification,
+the output from this command will indicate the binutils version;
+please post it in its entirety,
+(i.e.&nbsp;copy&#8209;and&#8209;paste it);
+<em><strong>do not</strong></em> trim,
+or exclude any part of it.
+</p></li>
+</ul><!-- binutils-info -->
+
+<ul class="overlapped" id="wsl-info">
+<li><strong>MinGW Runtime Library and Windows API Version</strong>
+<p>Since the majority of bugs,
+which are directly attributable to MinGW, will,
+in some way, be related to the MinGW Runtime Library,
+or its associated Windows API implementation,
+it is imperative that you tell us which versions of these
+you are using;
+these may be identified by running (in the MSYS shell):
+</p><pre class="box-out vt">
+$ <kbd>echo "#include &lt;windows.h&gt;" | gcc -E -dM -xc - | egrep "(MINGW32|W(IN|32)API)_VERSION"
+</kbd></pre>
+<p>or its equivalent with a cross&#8209;compiler suite,
+(with a host prefix of, e.g.&nbsp;&#8216;<code>mingw32</code>&#8217;):
+</p><pre class="box-out vt">
+$ <kbd>echo "#include &lt;windows.h&gt;" | mingw32-gcc -E -dM -xc - | egrep "(MINGW32|W(IN|32)API)_VERSION"
+</kbd></pre>
+<p>If you are running the compiler suite from Microsoft&#8217;s
+<code>cmd.exe</code> prompt,
+identification of these package versions becomes rather more awkward:
+</p>
+<ol style="margin-top: -0.3em; margin-left: -1.1em; list-style: lower-alpha">
+<li>Firstly &mdash;
+unless you have an external (third&#8209;party) implementation
+of <code>echo.exe</code> (or a suitable alternative),
+which mimics the Bourne shell interpretation of quoted arguments
+&mdash; the command:
+<pre class="box-out vt">
+C:\&gt; <kbd>echo "#include &lt;windows.h&gt;"</kbd>
+"#include &lt;windows.h&gt;"
+</pre>
+<p>will leave the enclosing quotes in place,
+resulting in an invalid statement to be passed through the pipe,
+to <code>gcc</code>.
+Omitting the quotes isn&#8217;t an option,
+because the &#8220;&lt;&#8221; and &#8220;&gt;&#8221; angle brackets,
+which enclose <code>&lt;windows.h&gt;</code>,
+will be interpreted as redirection operators,
+and will invalidate the syntax of the <code>echo</code> command itself:
+</p><pre class="box-out vt">
+C:\&gt; <kbd>echo #include &lt;windows.h&gt;</kbd>
+The syntax of the command is incorrect.
+</pre>
+<p>Escaping the angle brackets yields the required output:
+</p><pre class="box-out vt">
+C:\&gt; <kbd>echo #include ^&lt;windows.h^&gt;</kbd>
+#include &lt;windows.h&gt;
+</pre>
+<p>but even this isn&#8217;t sufficient,
+when this output is piped to <code>gcc</code>:
+</p><pre class="box-out vt">
+C:\&gt; <kbd>echo #include ^&lt;windows.h^&gt; | gcc -E -dM -xc -</kbd>
+The syntax of the command is incorrect.
+#define ...
+...
+</pre>
+<p>It appears that construction of the pipeline causes
+the command to be parsed twice, and that the escaped angle brackets
+are reinterpreted as redirection operators, on the second parse.
+To correct this, the angle brackets must be escaped twice:
+</p><pre class="box-out vt">
+C:\&gt; <kbd>echo #include ^^^&lt;windows.h^^^&gt; | gcc -E -dM -xc -</kbd>
+#define ...
+...
+</pre>
+</li>
+<li>Secondly &mdash;
+unless you have a third&#8209;party implementation
+of <code>egrep.exe</code> (or a suitable alternative) &mdash;
+it may be necessary to use Microsoft&#8217;s <code>find</code> command;
+since this does not support regular&#8209;expression matching,
+each version tag match requires a separate command invocation.
+<pre class="box-out vt">
+C:\&gt; <kbd>echo #include ^^^&lt;windows.h^^^&gt; | gcc -E -dM -xc - | find "MINGW32_VERSION"
+</kbd>#define MINGW32_VERSION ...
+
+C:\&gt; <kbd>echo #include ^^^&lt;windows.h^^^&gt; | gcc -E -dM -xc - | find "W32API_VERSION"
+</kbd>#define W32API_VERSION ...
+</pre>
+</li>
+</ol>
+<p>Given the above limitations,
+emulation of the recommended Bourne shell command for
+identification of the installed MinGW Runtime Library version,
+and the associated Windows API version, from Microsoft&#8217;s <code>cmd.exe</code>,
+without the assistance of any third&#8209;party utility programs,
+may require a command sequence such as:
+</p><pre class="box-out vt">
+C:\&gt; <kbd>for %T in (MINGW32 W32API WINAPI) do @(</kbd>
+More? <kbd>echo #include ^^^&lt;windows.h^^^&gt; | gcc -E -dM -xc - | find "%T_VERSION"
+</kbd>More? <kbd>)</kbd>
+#define MINGW32_VERSION ...
+#define W32API_VERSION ...
+</pre>
+<p>which does appear to achieve the desired result,
+at least when run from <code>cmd.exe</code> on Windows&#8209;XP.
+</p></li>
+</ul><!-- wsl-info -->
+
+<ul class="overlapped" id="sscce">
+<li><strong>Minimal Self-Contained Test Case</strong>
+<p>A simple test case is the only way to reproduce a bug,
+if code doesn't behave as expected or won't compile.
+Trim your source code to the minimal set of statements
+needed to demonstrate the bug,
+and eliminate dependencies on headers,
+other than those provided as components of a standard MinGW installation;
+(if you cannot eliminate such external header dependencies,
+then please consider that your bug report should,
+more than likely,
+be directed to the project providing those headers).
+</p>
+<p>Unless you are reporting a failure of MinGW to compile code,
+which you believe to be valid,
+the test case should be compilable,
+<em>directly from the command line</em>,
+using <em>only</em> tools which are provided by the MinGW Project.
+It should be reduced to a single compilation unit.
+Do not post code that has to be modified,
+in order to demonstrate the bug.
+Do not post project files requiring the use of any IDE,
+(<em>Integrated Development Environment</em>),
+even if that IDE relies on MinGW to furnish its compiler suite.
+</p>
+<p>If you <em>are</em> reporting failure to compile code,
+which you believe to be valid,
+then please double check against the relevant standards,
+to ensure that your code really is valid;
+it is, alas, all too common to see such reports,
+where the test case is definitively <em>invalid</em>.
+</p></li>
+</ul><!-- sscce -->
+
+<ul class="overlapped" id="references">
+<li><strong>Documentation or References</strong>
+<p>If the bug is related to a missing
+<a target="_blank" href="index.html?page=w32api.html">MS&#8209;Windows API</a>,
+or <a target="_blank" href="index.html?page=mingwrt.html">MinGW Runtime</a>
+feature, please give us links to references and/or documentation
+which will facilitate the implementation of the feature.
+A good source of documentation is MSDN (Microsoft Developer Network).
+Conversely, information abstracted from any Microsoft SDK,
+or even from a code base published under the GNU General Public Licences,
+(GPL or LGPL), is not a good source;
+the licences governing the redistribution of such information
+are not compatible with MinGW's public domain paradigm,
+and such information is, therefore,
+not accepted as a basis for implementation of MinGW features.
+</p>
+<p>Please also include, in your post,
+the version of your mingw-runtime,
+(found in header file <em>_mingw.h</em>),
+and of w32api, (found in header file <em>w32api.h</em>).
+</p></li>
+</ul><!-- references -->
+
+<ul class="overlapped" id="other-info">
+<li><strong>Any Other Detailed Information</strong>
+<p>Any other detailed information,
+which is pertinent to your experience with the bug,
+will always be appreciated and may be helpful.
+</p></li>
+</ul><!-- other-info -->
+</div><!-- guidelines -->
+
+<div class="overlapped" id="generic-bugs">
+<h3>Generic Package Bugs</h3>
+<p>Under certain circumstances
+you may find a bug in a base package, such as MinGW&#8209;GCC,
+that is platform independent (i.e. it can be reproduced
+on a platform other than one running a Windows operating system).
+In this situation please generate a simple test case
+that illustrates the bug using only standard headers and libraries
+and submit the bug report, following the procedure detailed above,
+prior to submitting it to the primary maintainers.
+</p>
+<p>After receiving verification,
+from a MinGW developer,
+that the bug is indeed platform independent,
+please use the appropriate bug tracker or mailing list
+to inform the package maintainers.
+It is in everyone's best interest that you try to use
+the package maintainers' standard methods
+and procedures for bug submission.
+Avoid submitting bugs specific to a port,
+or application that is not a part of the primary package,
+to any mailing list other than the
+<a target="_blank" href="index.html?page=mailing.html#mingw-users"
+>MinGW-Users list</a>.
+If you are uncertain about bug submission to another package maintainer,
+please seek assistance on the
+<a target="_blank" href="index.html?page=mailing.html#mingw-users"
+>MinGW-Users list</a>.
+</p>
+</div><!-- generic-bugs -->
+
+<div class="overlapped" id="post-report">
+<h3>Posting a Bug Report</h3>
+<p>Please post bug reports using the
+<a rel="noopener noreferrer" target="_blank"
+ href="https://osdn.net/projects/mingw/ticket/"
+>MinGW Issues ticket system</a>,
+(hosted within OSDN.net's bug reporting system).
+You will need a <a rel="noopener noreferrer" target="_blank"
+ href="https://osdn.net/#loginbox"
+>OSDN.net login</a> account to post;
+if you don't have one then <a rel="noopener noreferrer"
+ target="_blank" href="https://osdn.net/account/register.php"
+>click here to register for one</a>.
+</p>
+<p>Please refrain from posting bug reports to the mailing list;
+we tend to lose track of bug reports posted there!
+If you have a specific question regarding making the bug report,
+then please use the <a target="_blank"
+ href="index.html?page=mailing.html#mingw-users"
+>MinGW-Users mailing list</a>
+to ask.
+</p>
+</div><!-- post-report -->
+
+<div class="overlapped" id="get-advice">
+<h3>In Case of Difficulty</h3>
+<p>If you have difficulty in understanding,
+or cannot furnish information to satisfy the above requirements,
+please ask for help on the <a target="_blank"
+ href="index.html?page=mailing.html#mingw-users"
+>MinGW-Users mailing list</a>.
+</p>
+</div><!-- get-advice -->
+
+<!-- $RCSfile$: end of file -->
