@@ -1,0 +1,603 @@
+<!DOCTYPE HTML><!--
+ *
+ * dllver.html
+ *
+ * Adaptation of Charles S. Wilson's observations on DLL naming, and
+ * ABI version identification conventions.
+ *
+ *
+ * $Id$
+ *
+ * Written by Keith Marshall <keith@users.osdn.me>
+ * Copyright (C) 2021, MinGW.OSDN Project
+ *
+ *
+ * Redistribution and use in source and 'compiled' forms (SGML, HTML,
+ * PDF, PostScript, RTF, etc) with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer as
+ *    the first lines of this file, unmodified.
+ *
+ * 2. Redistributions in compiled form (transformed to other DTDs,
+ *    converted to PDF, PostScript, RTF and other formats) must
+ *    reproduce the above copyright notice, this list of conditions
+ *    and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS DOCUMENTATION IS PROVIDED BY THE MINGW.OSDN PROJECT "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE MINGW.OSDN PROJECT, OR
+ * ITS CONTRIBUTORS, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ *
+ *
+ * Note: this page assumes browser support for the following numeric
+ * HTML entity codes:
+ *
+ *    &#8209;   non-breaking hyphen
+ *    &#8216;   typographic left (opening) single quote
+ *    &#8217;   typographic apostrophe/right (closing) single quote
+ *    &#8220;   typographic left (opening) double quote
+ *    &#8221;   typographic right (closing) double quote
+ *
+-->
+<script class="masthead">
+ set_page("title", "MinGW Software Deployment Guide");
+ set_page("subtitle", "HOWTO Manage a Collection of Installed MinGW DLLs");
+</script><!-- masthead -->
+<div class="masthead" style="display: none">
+<p class="byline">Posted: 22-Nov-2021, by Keith; Last Update: 22-Nov-2021</p>
+</div><!-- masthead -->
+<div class="overlapped" id="introduction">
+<h3>Introduction</h3>
+<p>This Mini&#8209;HOWTO offers advice on installation,
+and explains the conventions which have been adopted by MinGW,
+(and also by Cygwin),
+to identify disparate versions of similarly named shared libraries, (DLLs),
+and so mitigate the &#8220;DLL Hell&#8221; which may arise,
+as a result of software dependencies on potentially
+incompatible versions of such DLLs.
+</p>
+<p>The content herein is derived from an original web document,
+originally posted by Soren Andersen, (a.k.a. Perlspinr),
+and now accessible only via <a rel="noopener noreferrer" target="_blank"
+ href="http://web.archive.org/web/20080516135947/http://home.att.net/~perlspinr/build_platforms/cygwin/libversioning.html"
+>this WayBack Machine archive</a>;
+this, in turn,
+was inspired by a no&#8209;longer&#8209;accessible posting,
+by Charles (Chuck) Wilson,
+on a mailing&#8209;list discussing
+Portable Network Graphics (PNG) implementation;
+the original content has been generalized,
+to eliminate PNG&#8209;specific references,
+and expanded upon, in a MinGW&#8209;specific context.
+</p>
+</div><!-- introduction -->
+
+<div class="overlapped" id="definitions">
+<h3>Definitions</h3>
+<dl class="hanging-indent">
+<dt>PE</dt>
+<dd>The Microsoft <em>Portable Executable</em>&hairsp;
+file format; an adaptation of the <em>common object file format</em>,
+it is sometimes identified as <em>PE&#8209;COFF</em>.
+</dd>
+<dt>ELF</dt>
+<dd><em>Executable and Linkable Format</em>&hairsp;;
+this is an alternative executable, and shared library file format,
+used by GNU/Linux, and several Unix systems;
+it is <em>not</em> used by MS&#8209;Windows.
+</dd>
+<dt>DLL</dt>
+<dd>A <em>dynamic link library</em>&hairsp;;
+this is the terminology favoured by Microsoft,
+when referring to shared libraries.
+</dd>
+<dt>Dynamic Linker</dt>
+<dd>An operating system facility,
+responsible for loading executable program files,
+and shared libraries,
+and resolving (linking) symbolic references across 
+executable file and shared library boundaries,
+to construct a run&#8209;time process image.
+</dd>
+<dt>Entry Point</dt>
+<dd>This is any one of the publicly visible variable names,
+or function names, which is exported by a specific DLL.
+</dd>
+<dt>Interface</dt>
+<dd>This represents the aggregate of all <em>entry points</em>,
+which are exported by the DLL.
+</dd>
+<dt>API</dt>
+<dd>This represents the <em>application programming interface</em>&hairsp;;
+it is, effectively, the <em>interface</em>,
+characterized by the <em>entry point</em> names,
+data types, and function prototypes.
+</dd>
+<dt>ABI</dt>
+<dd>This is the <em>application binary interface</em>&hairsp;;
+it represents, and is characterized by,
+the machine&#8209;level implementation of the <em>interface</em>.
+</dd></dl>
+</div><!-- definitions -->
+
+<div class="overlapped" id="dll-references">
+<h3>How the MS&#8209;Windows Dynamic Linker Resolves Shared Library References</h3>
+<p>When a <em>PE</em>&hairsp; file,
+(typically, but not restricted to,
+an <em>executable</em>&hairsp;
+&#8216;<em><code>*.exe</code></em>&hairsp;&#8217;,
+or a <em>shared library</em>&hairsp;
+&#8216;<em><code>*.dll</code></em>&hairsp;&#8217;
+file), is created, the <em>build&#8209;time</em>&hairsp; linker,
+(e.g.&nbsp;the MinGW linker ... <em>not</em>&hairsp;
+the <em>dynamic linker</em><span class="nowrap">&hairsp;),</span>
+embeds references, within the <em>PE</em>&hairsp; file itself,
+to any shared libraries on which it depends.
+Each such reference takes the form of just a DLL file name,
+<em>without</em>&hairsp; any directory path name qualification,
+and there is no direct analogue for the <em>ELF</em>&thinsp;
+<span class="nowrap">&#8216;<em><code>rpath</code></em>&thinsp;&#8217;</span>
+feature.
+</p>
+<p>When the Windows <em>dynamic linker</em>&hairsp; creates a new process image,
+it first loads the <em>PE</em>&hairsp; executable program file into memory.
+It then attempts to load each shared library,
+named as a DLL reference within the <em>PE</em>&hairsp; file,
+(and iteratively,
+any further named DLL references within the loaded DLLs themselves),
+mapping each one into the process address space,
+and resolving symbol references across DLL boundaries;
+only after all named DLLs have been loaded,
+and all symbol references successfully resolved,
+will execution of the process commence.
+</p>
+<p>To locate each DLL, named in <em>PE</em>&hairsp; file references,
+the MS&#8209;Windows <em>dynamic linker</em> will search
+in each of the following directories, in turn;
+(this search will continue, through the directory sequence,
+only as far as is necessary to locate the <em>first</em>&hairsp;
+DLL file, with a name which matches the reference):
+</p><ol>
+<li>The directory from which the executable file, itself, was loaded.
+</li>
+<li>The current working directory, at process start&#8209;up time.
+</li>
+<li>The Windows system directory;
+the path name for this directory may be identified,
+by calling the <code>GetSystemDirectory()</code> function.
+</li>
+<li>The Windows directory;
+the path name for this directory may be identified,
+by calling the <code>GetWindowsDirectory()</code> function.
+</li>
+<li>The sequence of directories, taken in turn,
+listed in the <code>PATH</code> environment variable;
+(note that this is the path searched for executables themselves;
+the <code>LIBPATH</code> environment variable is <em>not</em> considered,
+and <code>LD_LIBRARY_PATH</code> &mdash; a standard environment variable
+which is commonly associated with <em>ELF</em>&hairsp; shared libraries &mdash;
+has no defined purpose in the MS&#8209;Windows environment).
+</li></ol>
+<p>Note that each uniquely named DLL file,
+irrespective of the directory path from whence it is loaded,
+will be mapped into the process address space only once.
+Furthermore, if the instance of each named DLL,
+which is located first in the above directory search sequence,
+fails to resolve all <em>entry points</em>&hairsp;
+which it is expected to provide,
+process execution will fail;
+the search will <em>not</em>&hairsp; be resumed,
+even if a similarly named DLL file,
+from a later directory in the search sequence,
+may be an alternative version,
+from which the missing <em>entry points</em>&hairsp;
+could have been resolved.
+</p>
+<p>It is important to ensure that,
+if an application requires a particular version of any DLL,
+that the correct DLL is installed in a location whence it will be identified
+early in the preceding search sequence.
+In a conventional MinGW installation,
+(typically in <code>C:\MinGW</code>),
+this is normally achieved by installation of <em>both</em>&hairsp;
+the <code>*.exe</code> files, <em>and</em>&hairsp; their associated DLLs,
+in the common <code>C:\MinGW\bin</code> directory,
+so that DLL identification is completed in accordance with rule (1), above.
+</p>
+<p>Alternatively,
+for any application whose <code>*.exe</code> files are <em>not</em>&hairsp;
+installed in the <code>C:\MinGW\bin</code> directory,
+(since <code>C:\MinGW\bin</code> will typically be listed within
+the user&#8217;s <code>PATH</code> environment variable),
+MinGW DLLs may be identified in accordance with rule (5).
+When applications depend on this DLL identification stratagem,
+it is <em>strongly</em>&hairsp; recommended that <em>all</em>&hairsp;
+MinGW DLLs be kept fully up to date,
+to ensure that compatibility is maintained,
+as explained below,
+for <em>all</em>&hairsp; dependent applications,
+regardless of age.
+</p>
+</div><!-- dll-references -->
+
+<div class="overlapped" id="implementation">
+<h3>How MinGW Shared Library Version Numbers are Assigned</h3>
+<p>The single value,
+as assigned as a MinGW shared library version number,
+is derived from an effective GNU libtool <em>current:revision:age</em> triplet,
+which itself, is managed in accordance with the convention described in
+<a rel="noopener noreferrer" target="_blank"
+ href="https://www.gnu.org/software/libtool/manual/html_node/Libtool-versioning.html#Libtool-versioning"
+>libtool&#8209;versioning section of the GNU libtool manual</a>:
+</p>
+<div class="box-out">
+<p>[...] libtool library versions are described by three integers:
+</p>
+<dl class="hanging-indent" style="margin-top: 0.2em">
+<dt>current</dt>
+<dd>The most recent interface [<em>ABI</em> version] number
+that this library implements.
+</dd>
+<dt>revision</dt>
+<dd>The implementation [revision] number of
+the <em><code>current</code></em>&hairsp; interface.
+</dd>
+<dt>age</dt>
+<dd>The difference between [the <em>ABI</em> version numbers of]
+the newest and oldest interfaces that this library implements.
+In other words,
+the library implements all the interface numbers in the range from number
+<em><code>current</code>&thinsp;<code>-</code>&thinsp;<code>age</code></em>&hairsp;
+to <em><code>current</code></em>.
+</dd></dl>
+</div><!-- box-out -->
+<p>These <em><code>current:revision:age</code></em> attributes are assigned,
+by the maintainer of the library,
+as specified in <a rel="noopener noreferrer" target="_blank"
+ href="https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html#Updating-version-info"
+>the immediately following section of the GNU libtool manual</a>:
+</p>
+<div class="box-out">
+<p>Here are a set of rules to help you update your library version information:
+</p><ol>
+<li>Start with version information of &#8216;<code>0:0:0</code>&#8217;
+for each libtool library.
+</li>
+<li>Update the version information only immediately before a public release
+of your software. More frequent updates are unnecessary, and only guarantee
+that the current interface number gets larger faster.
+</li>
+<li>If the library source code has changed at all,
+since the [version information was last updated],
+then increment <em><code>revision</code></em>&hairsp; <span class="nowrap">(i.e. 
+&#8216;<em><code>current:revision:age</code></em>&hairsp;&#8217;</span> becomes
+&#8216;<span class="nowrap"><em><code>current:revision</code></em>&thinsp;<!--
+--><code>+</code>&hairsp;<code>1<em>:age</em></code>&hairsp;&#8217;<!--
+-->&hairsp;).</span>
+</li>
+<li>If any interfaces have been added, removed,
+or changed since the last update,
+increment <em><code>current</code></em>,
+and set <em><code>revision</code></em>&hairsp; to <code>0</code>.
+</li>
+<li>If any interfaces [i.e.&nbsp;<em>entry points</em>&hairsp;]
+have been added since the last public release,
+then increment <em><code>age</code></em>.
+</li>
+<li>If any interfaces [i.e.&nbsp;<em>entry points</em>&hairsp;] have been removed,
+or [the <em>data type</em> or <em>function prototype</em>
+of any <em>entry point</em> has been] changed since the last public release,
+then set <em><code>age</code></em>&hairsp; to <code>0</code>. 
+</li></ol>
+<p><em><strong>Never</strong></em> try to set the interface numbers
+so that they correspond to the release number of your package.
+This is an abuse that only fosters misunderstanding of
+the purpose of library versions. [...]
+</p>
+<p>The following explanation
+may help [you] to understand the above rules a bit better:
+consider that there are three possible kinds of reactions
+from users of your library to changes in a shared library:
+</p><ol>
+<li>Programs using the previous version
+may use the new version as drop-in replacement,
+and programs using the new version can also work with the previous one.
+In other words, no recompiling nor relinking is needed.
+In this case, bump <em><code>revision</code></em>&hairsp; only,
+don&#8217;t touch <em><code>current</code></em>&hairsp;
+[or] <em><code>age</code></em>.
+</li>
+<li>Programs using the previous version
+may use the new version as drop-in replacement,
+but programs using the new version may use <em>APIs</em>
+[which are] not present in the previous one.
+In other words, a program linking against the new version
+may fail with &#8220;unresolved symbols&#8221;
+if [deployed with] the old version at runtime:
+set <em><code>revision</code></em>&hairsp; to <code>0</code>,
+bump [i.e. increment both] <em><code>current</code></em>&hairsp;
+and <em><code>age</code></em>.
+</li>
+<li>Programs may need to be changed,
+recompiled, and relinked in order to use the new version.
+Bump <em><code>current</code></em>,
+set [both] <em><code>revision</code></em>&hairsp;
+and <em><code>age</code></em>&hairsp; to <code>0</code>. 
+</li></ol>
+<p>In the above description,
+<em>programs</em> using the library in question may also be
+replaced by other libraries using it.
+</p>
+</div><!-- box-out -->
+<p>To derive the single&#8209;valued MinGW shared library version number,
+from the GNU libtool compatible
+<em><code>current:revision:age</code></em>&hairsp; triplet,
+we adopt the convention originally suggested by Gary Vaughan,
+in a <a rel="noopener noreferrer" target="_blank"
+ href="https://cygwin.com/pipermail/cygwin/2000-September/040213.html"
+>posting to the Cygwin mailing&#8209;list</a>,
+to the effect that the effective shared library version should be
+set equal to the version number of the <em>oldest ABI</em>&hairsp; version
+supported by the shared library;
+this is equivalent to the result of the calculation
+<em><code>current</code>&thinsp;<code>-</code>&thinsp;<code>age</code></em>,
+taking the individual values of <em><code>current</code></em>,
+and <em><code>age</code></em>&hairsp; from the libtool triplet.
+(Note that this does <em>not require</em>&hairsp; use of libtool
+for maintanence of the shared library;
+it is sufficient to adopt the libtool numbering convention,
+and to calculate
+<em><code>current</code>&thinsp;<code>-</code>&thinsp;<code>age</code></em>&hairsp;
+manually).
+</p>
+</div><!-- implementation -->
+
+<div class="overlapped" id="explanation">
+<h3>Evolution of MinGW Shared Library Versions</h3>
+<p>To further illustrate the evolution of MinGW shared library versions,
+let us consider the development life&#8209;cycle of
+a hypothetical library, <code>libfoo.dll</code>,
+for which the most recent release corresponds to a GNU libtool
+<em><code>current:revision:age</code></em>&hairsp; triplet
+of <code>5:4:3</code>;
+this indicates that the <em>current ABI</em>&hairsp; version of
+this hypothetical library is <code>5</code>,
+and that this version is fully <em>backwardly compatible</em>&hairsp; with
+each of the <em>three</em>&hairsp; preceding releases,
+with <em>ABI</em>&hairsp; version numbers <code>4</code>,
+<code>3</code>, and <code>2</code>;
+thus, the MinGW library version,
+computed as <em><code>current</code>&thinsp;<code>-</code>&thinsp;<code>age</code></em>,
+will be <code>2</code>,
+yielding a versioned library name of <code>libfoo-2.dll</code>;
+it may be observed that this version&#8209;indicating name corresponds to
+the <em>oldest ABI</em>&hairsp; version which is fully compatible with
+the <em>current ABI</em>&hairsp; version <code>5</code> release.
+</p>
+<p>There are many evolutionary paths,
+which <code>libfoo&#8209;2.dll</code> may have followed,
+to become the equivalent of a libtool&#8209;managed <code>5:4:3</code> release;
+the following example represents just one such possible path:
+</p><ol>
+<li>Regardless of the path followed,
+the starting point is <em>always</em> equivalent to
+libtool release <code>0:0:0</code>, yielding a computed
+<em><code>current</code>&thinsp;<code>-</code>&thinsp;<code>age</code></em>&hairsp;
+value of <code>0</code>&thinsp;<code>-</code>&thinsp;<code>0</code>,
+(or simply <code>0</code>);
+thus, the MinGW designation for the <em>initial</em> release
+will be <code>libfoo&#8209;0.dll</code>.
+</li>
+<li>The library goes through several release cycles,
+without any change in, addition to,
+or removal from its public <em>interface</em>&hairsp;;
+the libtool <em><code>revision</code></em>&hairsp; is incremented,
+at each release,
+through <code>0:1:0</code>,&thinsp;<code>0:2:0</code>,&thinsp;<code>...</code>,
+but, since neither <em><code>current</code></em>,
+nor <em><code>age</code></em>&hairsp; is changed,
+the MinGW release designation remains as <code>libfoo&#8209;0.dll</code>.
+<p>This is correct,
+because the <em>interface</em>&hairsp; remains unchanged from
+the <em>initial</em>&hairsp; release;
+programs linked against the initial release may continue to use
+this <code>libfoo&#8209;0.dll</code>,
+as a drop&#8209;in replacement for the original,
+while benefitting from any bug&#8209;fixes
+which may have been applied in the newer releases.
+</p></li>
+<li>Following the release of <code>libfoo&#8209;0.dll</code>,
+corresponding to (say) libtool release <code>0:4:0</code>,
+a new function <em>entry point</em>&hairsp; is added,
+<em>without</em>&hairsp; changing the established interface
+<em>in any way</em>.
+This introduces a <em>forwardly incompatible</em>&hairsp;
+change in the <em>API</em>,&hairsp; (because any new application
+which depends on the new <em>entry point</em>&hairsp; will be
+incompatible with any earlier release of <code>libfoo&#8209;0.dll</code>);
+however, the <em>API</em>&hairsp; remains <em>backwardly compatible</em>&hairsp;
+with previous releases, (because <em>none</em>&hairsp; of the
+previously existing <em>entry points</em>&hairsp; exhibit
+any change in behaviour).
+<p>To reflect this change in compatibility,
+the libtool <em><code>current</code></em>&hairsp; version number
+is incremented,
+while resetting the <em><code>revision</code></em>&hairsp;
+to <code>0</code>,
+(to account for the addition of the new <em>entry point</em>&hairsp;);
+at the same time, <em><code>age</code></em>&hairsp;
+is incremented in lock&#8209;step,
+(because <em>backward</em>&hairsp; compatibility,
+with the preceding release, is preserved).
+Consequently, the libtool release identification becomes <code>1:0:1</code>,
+since the result of computing
+<em><code>current</code>&thinsp;<code>-</code>&thinsp;<code>age</code></em>,
+(which now becomes <code>1</code>&thinsp;<code>-</code>&thinsp;<code>1</code>),
+remains equal to <code>0</code>, and thus,
+the MinGW library designation remains as
+<code>libfoo&#8209;0.dll</code>.
+Once again, this is correct; in spite of the change
+in libtool <em><code>current</code></em>&hairsp; release number,
+the <em>oldest</em>&hairsp; value of <em><code>current</code></em>&hairsp;
+release, with which this release remains <em>backwardly</em>&hairsp; compatible,
+is still <code>0</code>.
+</p></li>
+<li>After the release of <code>libfoo&#8209;0.dll</code>,
+at libtool release point <code>1:0:1</code>,
+one of the publicly visible <em>entry point</em>&hairsp; functions
+is deemed to have become obsolete, and is removed.
+This represents another change to the public <em>interface</em>,
+so once again the libtool <em><code>current</code></em>&hairsp;
+release number must be incremented,
+and the <em><code>revision</code></em>&hairsp; reset;
+however, this is <em>not</em>&hairsp; a <em>backwardly
+compatible</em>&hairsp; change, so, for this release,
+<em><code>age</code></em>&hairsp; is reset to <code>0</code>,
+rather than being incremented.
+The effect of this is that the libtool release number advances
+to <code>2:0:0</code>, and the MinGW release number, computed as
+<em><code>current</code>&thinsp;<code>-</code>&thinsp;<code>age</code></em>,
+advances to <code>2</code>, resulting in a new MinGW library designation
+of <code>libfoo&#8209;2.dll</code>.
+<p>Note that this is, once again, correct:
+the libtool <em><code>current</code></em>&hairsp; release number has advanced,
+to <code>2</code>; this release is no longer <em>backwardly</em>&hairsp;
+compatible with any other release, older than itself,
+and the MinGW release number has also advanced accordingly;
+this <code>libfoo&#8209;2.dll</code> is <em>not</em>&hairsp; suitable for
+use as a drop&#8209;in replacement for <code>libfoo&#8209;0.dll</code>,
+and the DLL file name has been changed, to prevent any such misuse.
+</p></li>
+<li>The next few release cycles,
+following the preceding release of <code>libfoo&#8209;2.dll</code>,
+may proceed as described in (2), above, thus requiring only
+the libtool <em><code>revision</code></em>&hairsp; to be incremented,
+<em>without</em>&hairsp; affecting the MinGW release number,
+<em>in any way</em>.
+These may be interspersed with three further cycles,
+similar to that described in (3), above,
+in which any number of new <em>entry points</em>&hairsp; are added,
+but <em>none</em>&hairsp; are removed or modified;
+after the third such type (3) release,
+the libtool release number will have advanced through
+<code>3:0:1</code>, <code>4:0:2</code>, and finally <code>5:0:3</code>.
+If this is then followed by by four further type (2) releases,
+there will be four further increments in
+the libtool <em><code>revision</code></em>,
+ultimately advancing the libtool release number to <code>5:4:3</code>;
+at this stage in the release cycle sequence, the
+<em><code>current</code>&thinsp;<code>-</code>&thinsp;<code>age</code></em>&hairsp;
+computation will continue to yield a MinGW release number of <code>2</code>,
+and the MinGW library will continue to be named <code>libfoo&#8209;2.dll</code>.
+</li></ol>
+<p>It may be observed that,
+following the preceding sequence of release cycles,
+whereas the libtool release number is able to convey the information that
+the current library version implements revision <code>4</code> of
+the implementation of version <code>5</code> of the <em>interface</em>,
+and that this implementation is fully <em>backwardly compatible</em>&hairsp;
+with version <code>2</code> of this interface,
+the MinGW release number cannot adequately convey any more than
+the last of these pieces of information.
+Although this limitation may appear to be problematic,
+in practice it isn&#8217;t, <em>provided</em>&hairsp; the installed
+version of <code>libfoo&#8209;2.dll</code> is its most recently
+released distribution;
+unlike <em>ELF dynamic linkers</em>,
+the <em>PE dynamic linker</em>&hairsp; simply isn&#8217;t smart enough
+to select a DLL on the basis of a <em>range</em>&hairsp; of supported
+<em>interface</em>&hairsp; versions,
+so the best we can hope for is that the selected library,
+as named for its <em>oldest</em>&hairsp; supported version,
+covers the required range;
+the most effective assurance that we can have for this
+is that the selected library is the most recently released distribution,
+with the specified name.
+</p>
+</div><!-- explanation -->
+
+<div class="overlapped" id="conclusion">
+<h3>Conclusion</h3>
+<p>&#8220;DLL Hell&#8221; arises
+when two identically named shared library files provide different
+(incompatible) <em>APIs</em>&hairsp; ... perhaps even incompatible versions
+of fundamentally the same <em>API</em>&hairsp;;
+a common cause is that installation of some third&#8209;party software
+product has overwritten an installed DLL file with an obsolete version.
+</p>
+<p>Sometimes,
+a particular software product requires a particular version of
+a specific DLL, with which the most recent version of that DLL is
+<em>not backwardly compatible</em>,&hairsp; (because the developer
+of that DLL may not have exercised good version control discipline).
+To avoid this kind of issue,
+MinGW has adopted a DLL version management discipline,
+conforming to the following conventions:
+</p><ul>
+<li>Each installed MinGW DLL should include, within its file name,
+a numerical indication of <em>oldest API</em>&hairsp; implementation version,
+(and corresponding <em>ABI</em>&hairsp; version),
+with which it remains&hairsp;<em>100% backwardly compatible</em>.
+</li>
+<li>Since the <em>API</em>&hairsp; version number,
+which is encoded within the DLL file name,
+represents the <em>oldest API implementation</em>&hairsp;
+with which the DLL is 100% <em>backwardly</em>&hairsp; compatible,
+newer versions may add new functionality
+<em>without</em>&hairsp; requiring a change of name,
+provided <em>all existing</em>&hairsp; functionality remains unchanged.
+</li>
+<li>If <em>API</em>&hairsp; functionality is changed,
+in any way which causes a break in <em>backwards</em>&hairsp; compatibility,
+the <em>API version number</em>&hairsp; indication,
+which is embedded within the DLL file name,
+<em>must</em>&hairsp; be incremented,
+(by at least one, but it may be by more),
+resulting in a corresponding change in the DLL file name.
+</li>
+<li>In the event that any MinGW DLL is published, <em>without</em>&hairsp;
+embedding an <em>API version number</em>&hairsp; in the file name,
+then the most recent release of this DLL <em>must</em>&hairsp; be
+<em>backwardly compatible</em>&hairsp; with <em>every</em>&hairsp;
+previous release of any MinGW DLL with the same name.
+</li></ul>
+<p>Adoption of these conventions ensures that,
+if the most recent release of each, and every required MinGW DLL is installed,
+at an appropriate location within the DLL directory search path,
+then, on account of the promise of <em>backwards compatibility</em>,&hairsp;
+applications which are dependent on any releases of these DLLs
+will continue to operate as intended.
+Additionally, it allows releases of mutually incompatible,
+similarly named (but for the version identifier) DLLs to co&#8209;exist,
+within the DLL search path,
+thus ensuring that applications which may depend on older,
+incompatible DLL versions,
+may continue to operate correctly.
+</p>
+<p>Unfortunately, the conventions alone <em>cannot</em>&hairsp;
+prevent any user, or third&#8209;party package installer,
+from replacing the most recent MinGW release of any DLL with an older release,
+(or with an incompatible third&#8209;party DLL with the same name).
+Since <em>forward compatibility</em>&hairsp; is <em>never</em>&hairsp; promised,
+for an older MinGW DLL release used in conjunction with an application
+which may be dependent on a more recent release,
+(nor is there <em>any</em>&hairsp; expectation of <em>any form of
+compatibility</em>&hairsp; from <em>any</em>&hairsp; third&#8209;party DLL),
+it becomes incumbent upon the user,
+to ensure that <em>only</em>&hairsp; the most recent
+releases of MinGW DLLs are (and remain) installed.
+</p>
+</div><!-- conclusion -->
+
+<!-- $RCSfile$: end of file -->
