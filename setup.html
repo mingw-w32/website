@@ -1,0 +1,938 @@
+<!DOCTYPE HTML><!--
+ *
+ * setup.html
+ *
+ * A guide to managed MinGW installation, for new users.
+ *
+ *
+ * $Id$
+ *
+--><meta author="Julien Lecomte" /><!--
+ * Copyright (C) 2007, 2021, MinGW.org Project
+ *
+ *
+ * Redistribution and use in source and 'compiled' forms (SGML, HTML,
+ * PDF, PostScript, RTF, etc) with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer as
+ *    the first lines of this file, unmodified.
+ *
+ * 2. Redistributions in compiled form (transformed to other DTDs,
+ *    converted to PDF, PostScript, RTF and other formats) must
+ *    reproduce the above copyright notice, this list of conditions
+ *    and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS DOCUMENTATION IS PROVIDED BY THE MINGW.ORG PROJECT "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE MINGW.ORG PROJECT, OR
+ * ITS CONTRIBUTORS, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ *
+ *
+ * Note: this page assumes browser support for the following numeric
+ * HTML entity codes:
+ *
+ *    &#8209;   non-breaking hyphen
+ *    &#8216;   typographic left (opening) single quote
+ *    &#8217;   typographic apostrophe/right (closing) single quote
+ *    &#8220;   typographic left (opening) double quote
+ *    &#8221;   typographic right (closing) double quote
+ *
+-->
+<style>
+div.h3-numbered ul { margin-left: -0.7em; }
+div.h3-numbered li > p + ul { margin-top: -0.3em; }
+div.h3-numbered p + ul { margin-top: 0.1em; }
+
+span.smaller { font-size: 0.9em; }
+pre.vt em::after { content: "&nbsp;"; font-size: 0.4pt; }
+
+ol.setup-steps { list-style: lower-roman; }
+ol.setup-steps > li:first-child { margin-top: 0; }
+ol.setup-steps div.desc { width: calc( 65% - 2em ); }
+ol.setup-steps > li { clear: both; margin-top: 1.0em; }
+ol.setup-steps img { width: 35%; float: right; margin: 0.2em 0 0 2em; }
+ol.setup-steps ol { list-style: number; margin: 0 0 0 -0.85em; }
+ol.setup-steps ul { list-style: disc; margin: 0 0 0 -0.7em; }
+ol.setup-steps ol > li::marker { font-size: 0.75em; }
+ol.setup-steps div.desc li { margin-right: 0; }
+ol.setup-steps p { margin-top: 0.4em; }
+
+ol.config-options { margin-left: -0.5em; }
+ol.config-options > li { margin-top: 0.4em; }
+ol.config-options > li::marker { font-size: 0.85em; }
+ol.config-options ul + p { margin-top: 0.3em; }
+ol.config-options ul { list-style: disc; }
+
+div.step-ref { clear: both; position: relative; top: -70px; height: 70px; }
+div.step-ref + li { margin-top: calc( 1.0em - 70px ); }
+</style>
+<script class="masthead">
+/* Script fragment, to assign titles specific to this page; this is
+ * encapsulated within the "masthead", where such titles are displayed,
+ * to ensure that whatever page content may follow will be correctly
+ * positioned, relative to the masthead content.
+ */
+ set_page("title", "Getting Started with MinGW");
+ set_page("subtitle",
+    "HOWTO Set Up the MinGW Compiler Suite &mdash; a Guide for New Users"
+  );
+</script><!-- masthead -->
+
+<p>This HOWTO document provides instructions,
+and recommendations, both for first&#8209;time installation,
+and subsequent maintenance of the MinGW (GCC) compiler suite,
+and ancillary MinGW applications and/or tools;
+the recommended method of installation is suitable
+for <em>all</em>&hairsp; users,
+regardless of experience,
+or level of expertise.
+</p>
+<p><strong><em>Caution</em></strong>&hairsp;:
+MinGW may have problems with paths containing spaces, and if not,
+other programs used with MinGW may often experience problems with such paths.
+Thus, we <strong><em>strongly recommend</em></strong>&hairsp; that you
+<strong><em>do not install MinGW in any location
+with spaces in the absolute path name</em></strong>&hairsp;;
+you should avoid installing into any directory or subdirectory
+having names like <code>&quot;Program</code>&#8197;<code>Files&quot;</code>
+or <code>&quot;My</code>&#8197;<code>Documents&quot;</code>, etc.
+</p>
+<p>The preferred installation target directory,
+its path name having been chosen to comply with the preceding recommendation,
+is <code><strong>C:\MinGW</strong></code>
+</p>
+<p>The preferred installation method is using
+the <code>mingw-get</code> &#8220;Installation Manager&#8221; tool,
+<a href="#start-here">as described below</a>.
+While a manual installation is possible,
+we recommend it only for expert users,
+unless you have a very old version of MS&#8209;Windows,
+which is unable to run the GUI variant of <code>mingw&#8209;get</code>.
+If you really want (or need) to resort to it,
+instructions for manual installation are provided in
+<a target="_blank" href="index.html?page=install.html"
+>this alternative HOWTO document</a>.
+</p>
+<p>After installation,
+you may need to perform some additional system configuration tasks yourself,
+to ensure your MinGW applications will run.
+Most importantly,
+you may need to set up <code>Start</code>&#8197;<code>Menu</code>,
+or <code>Desktop</code> &#8220;short&#8209;cuts&#8221;,
+to launch a suitable command line interpreter session,
+with appropriate environment variable settings,
+(notably, the <code>PATH</code> setting),
+for running MinGW applications;
+further details may be found in the
+<a href="#post-install">post&#8209;installation section</a>,
+below.
+</p>
+<p>Ultimately,
+having completed installation and configuration,
+you will wish to perform occasional maintenance tasks,
+perhaps to install additional packages,
+and certainly to install software updates,
+and so keep your installation up&#8209;to&#8209;date;
+suitable maintenance procedures are discussed in
+<a href="#maintenance">the final section</a>
+of this document.
+</p>
+
+<div class="h3-numbered">
+<div class="overlapped" id="start-here">
+<h3>Setting Up the MinGW Installation Manager for First&#8209;Time Use</h3>
+<p>The first step,
+in the recommended procedure for creating a new MinGW installation,
+is to install the <code>mingw-get</code> installer itself;
+this can be most readily accomplished by downloading,
+and subsequently running,
+<a rel="noopener noreferrer" target="_blank"
+ href="https://osdn.net/dl/mingw/mingw-get-setup.exe"
+>the GUI <code>mingw&#8209;get&#8209;setup.exe</code> tool</a>.
+</p>
+<p>If you have previously installed <code>mingw&#8209;get</code>,
+and your objective is to upgrade, or to extend,
+its associated (existing) MinGW installation,
+then you should <em>not</em> run <code>mingw&#8209;get&#8209;setup.exe</code> again;
+you <em>should</em> simply run <code>mingw&#8209;get.exe</code>, and
+<a href="#install-packages">proceed directly to the next installation phase</a>.
+</p>
+<p>If do wish to run <code>mingw&#8209;get&#8209;setup.exe</code>,
+and you already have a local copy,
+we <em>strongly</em> recommend that you check its publication date,
+to ensure that it is no older than the current release,
+<a rel="noopener noreferrer"
+ target="_blank" href="https://osdn.net/projects/mingw"
+>as identified at https://osdn.net/projects/mingw</a>;
+you should <em>always</em> run the most recent release of
+<code>mingw&#8209;get&#8209;setup.exe</code>,
+so please download a replacement copy,
+if yours is out of date.
+</p>
+<p>When you <em>do</em> choose to run
+<code>mingw&#8209;get&#8209;setup.exe</code>,
+you should follow this sequence of steps:&ndash;
+</p>
+<ol class="setup-steps">
+<li><img src="https://static-cdn.osdn.net/thumb/g/5/213/800x600_0.png"
+ alt="Installer Setup &mdash; Opening Dialogue"
+/><div class="desc">
+Depending on your MS&#8209;Windows version,
+and its system security policy configuration,
+you may be able to invoke <code>mingw&#8209;get&#8209;setup.exe</code>
+directly from the <a rel="noopener noreferrer"
+ target="_blank" href="https://osdn.net/dl/mingw/mingw-get-setup.exe"
+>download link specified above</a>;
+alternatively, you may need to save a local copy,
+locate it in the file&#8209;system explorer,
+and double&#8209;click to invoke it.
+In either case, and again depending on Windows version,
+and security policy configuration,
+you may need to authorize execution of
+<code>mingw&#8209;get&#8209;setup.exe</code>,
+and the changes it will make to your system,
+after which you should see a dialogue similar
+to that depicted to the right.
+<p>When you see this dialogue,
+we advise you to acquaint yourself with the content
+of the warranty disclaimer, and additional &#8220;blurb&#8221;,
+which appears below the copyright notice;
+you may also wish to review the licensing terms,
+which will be displayed in a web browser window,
+if you click the <code>View</code>&#8197;<code>Licence</code> button.
+</p>
+<p>When you are ready to proceed,
+click the <code>Install</code> button to move on to the next step;
+alternatively, you may click the <code>Cancel</code> button
+to abandon the installation process.
+</p>
+</div><!-- ol.setup-steps desc -->
+</li>
+<div class="step-ref" id="step-1-ii"></div>
+<li><img src="https://static-cdn.osdn.net/thumb/g/5/214/800x600_0.png"
+ alt="Installer Setup &mdash; Preferences Dialogue"
+/><div class="desc">
+On progressing from the opening dialogue,
+by clicking on the <code>Install</code> button
+as stipulated in the preceding step,
+you will be presented with a new dialogue,
+as depicted to the right.
+Here, you have the opportunity to select from
+a set of optional configuration attributes for
+your <code>mingw&#8209;get</code> installation,
+and for the associated MinGW installation,
+which you will use it to manage.
+<p>You may observe, when this dialogue is opened,
+that the installation directory is specified, by default,
+to be <code>C:\MinGW</code>.
+We <em>strongly</em> recommend that you leave this
+at its default setting,
+<em>except</em> in the particular cases where:&ndash;
+<ul><li>Your system policy forbids installation into a directory
+at this level within the file&#8209;system hierarchy,
+and you are unable to obtain authorization for an exception
+to such a policy.
+</li>
+<li>You require an alternative installation root directory,
+for the purpose of creating <em>side&#8209;by&#8209;side</em>
+MinGW sandbox installations.
+</li></ul>
+<p>If you do choose to change the installation directory,
+you may click the <code>Change</code> button to open
+a standard file&#8209;system navigation dialogue,
+whence you may select, or create, an alternative directory;
+<em>do</em> please heed the warning about avoiding any
+directory name, which introduces white&#8209;space into
+its absolute path name.
+</p>
+<p>Other installation options, which you may select via this dialogue,
+include:&ndash;
+</p>
+<ul><li>Installation of the <code>mingw&#8209;get</code> GUI application,
+in addition to the CLI version, (which is <em>always</em> installed).
+</li>
+<li>Installation of Windows &#8220;shortcuts&#8221;,
+either on the desktop,
+or in the Windows <code>Start</code>&nbsp;<code>Menu</code>, (or both),
+for either the current user only (<em>strongly</em> recommended),
+or for all users;
+(if installed, these will launch the <code>mingw&#8209;get</code>
+GUI client, and thus are effective only if that is installed).
+</li></ul>
+<p>Once you have specified your choice of installation root directory,
+and completed your selection of installation options,
+you may click the <code>Continue</code> button,
+to proceed to the next step &mdash; the actual installation
+of <code>mingw&#8209;get</code>.
+</p>
+</div><!-- ol.setup-steps desc -->
+</li>
+<li><img src="https://static-cdn.osdn.net/thumb/g/5/215/800x600_0.png"
+ alt="Installer Setup &mdash; Download Dialogue"
+/><div class="desc">
+Your computer <em>must</em> remain actively connected to the internet,
+throughout this step, which should proceed <em>without</em> user intervention.
+<p>While the process proceeds, you should observe a dialogue similar to
+that depicted to the right; the data displayed will be dynamically
+updated, as the constituent packages of <code>mingw&#8209;get</code>
+are downloaded from the MinGW.org on&#8209;line file store,
+and installed locally, into your designated installation directory tree.
+</p>
+<p>You may observe that,
+while download and installation are in progress,
+the <code>Continue</code> and <code>Quit</code>
+buttons are <em>disabled</em>;
+they will be <em>enabled</em>, only when the process completes.
+</p>
+<p>If errors occur, during the download and installation process,
+only the <code>Quit</code> button will be <em>enabled</em>,
+allowing you to terminate <code>mingw&#8209;get&#8209;setup.exe</code>;
+please <a target="_blank"
+ href="index.html?page=faq.html#troubleshoot-installation"
+>consult the FAQ</a>, or <a target="_blank"
+ href="index.html?page=mailing.html#mingw-users"
+>seek advice via the mailing list</a>,
+for assistance to troubleshoot, and resolve the errors,
+<em>before</em> running <code>mingw&#8209;get&#8209;setup.exe</code> again.
+</p>
+<p>When the download and installation of <code>mingw&#8209;get</code>
+completes successfully, <em>both</em> the <code>Continue</code>,
+<em>and</em> the <code>Quit</code> buttons will be <em>enabled</em>.
+At this point, you may choose to:&ndash;
+</p>
+<ul><li>Click the <code>Continue</code> button,
+to terminate <code>mingw&#8209;get&#8209;setup.exe</code>,
+and <em>immediately</em> start <code>mingw&#8209;get</code> in GUI mode;
+(note that the <code>mingw&#8209;get</code> GUI is available at this point,
+at least temporarily, even if you chose not to install it permanently).
+</li>
+<li>Click the <code>Quit</code> button,
+to terminate <code>mingw&#8209;get&#8209;setup.exe</code>
+<em>without</em> starting <code>mingw&#8209;get</code>;
+(you may resume installation of MinGW later,
+by running stand&#8209;alone <code>mingw&#8209;get</code>,
+either in CLI mode,
+or &mdash; if you chose to install it as a permanent capability &mdash;
+in GUI mode).
+</li></ul>
+<p>Regardless of which of the preceding options you choose,
+<code>mingw&#8209;get&#8209;setup.exe</code> has completed its task;
+when you proceed to the next stage of the installation process,
+you will be running <code>mingw&#8209;get</code>,
+<em>not</em>&hairsp; <code>mingw&#8209;get&#8209;setup.exe</code>.
+</p>
+</div><!-- ol.setup-steps desc -->
+</li></ol>
+</div><!-- start-here -->
+
+<div style="clear: both"></div>
+<div class="overlapped" id="install-packages">
+<h3>Using the MinGW Installation Manager to Install Packages</h3>
+<p>Once you have completed the installation of
+<code><strong>mingw&#8209;get</strong></code>,
+(which is also known,
+particularly in its GUI guise,
+as the &#8220;MinGW Installation Manager&#8221;),
+you may use it to proceed with the installation of your choice of packages,
+to complete (or subsequently extend) your MinGW installation.
+Assuming that you have started the GUI variant of <code>mingw&#8209;get</code>,
+either (having chosen to install it
+at <a href="#step-1-ii">step ii of the set up procedure</a>)
+as a free&#8209;standing application,
+or by continuation from within <code>mingw&#8209;get&#8209;setup.exe</code>,
+you will be presented with a three&#8209;paned window display,
+whence you may proceed as follows:&ndash;
+</p>
+<ol class="setup-steps">
+<li><img src="https://static-cdn.osdn.net/thumb/g/7/709/800x600_0.png"
+ alt="Installer &mdash; Basic Package View"
+/><div class="desc">
+When <code>mingw&#8209;get</code> is invoked as a continuation
+of <code>mingw&#8209;get&#8209;setup.exe</code>,
+the initial three&#8209;paned view will appear as on the right;
+(alternatively,
+this view may be accessed by selecting
+the <code>Basic</code>&#8197;<code>Setup</code>
+option in the left&#8209;hand window pane,
+at any time,
+regardless of whether <code>mingw&#8209;get</code> is running
+as a continuation of <code>mingw&#8209;get&#8209;setup.exe</code>,
+or as a free&#8209;standing application).
+<p>Within this view,
+you will see a list (in the upper right&#8209;hand pane) of those packages
+which are likely to be of most interest to first&#8209;time MinGW users;
+you may select any one of these packages,
+to see related package information on the tabs of
+the lower right&#8209;hand pane,
+and,
+by clicking on the small square button,
+to the left of any selected package entry,
+you may choose (from its context menu) to mark one (or more) packages,
+which you would like to install ...
+for first&#8209;time users,
+we recommend that you elect to install,
+at least,
+the <code>mingw32&#8209;base&#8209;bin</code> package,
+(which comprises the C compiler and essential ancillary tools);
+if you require a C++ compiler,
+in addition to the C compiler,
+you should also elect to install
+the <code>mingw32&#8209;g++&#8209;bin</code> package.
+</div><!-- ol.setup-steps desc -->
+</li>
+<div style="clear: both"></div>
+<li><img src="https://static-cdn.osdn.net/thumb/g/7/710/800x600_0.png"
+ alt="Installer &mdash; All Package View"
+/><div class="desc">
+Conversely,
+when the GUI variant of <code>mingw&#8209;get</code> is invoked
+as a free&#8209;standing application,
+the initial three&#8209;paned view will appear as on the right;
+(alternatively,
+this view may be accessed by selecting the
+<span class="nowrap"><code>All</code>&#8197;<code>Packages</code></span> option,
+in the left&#8209;hand pane,
+regardless of how <code>mingw&#8209;get</code> has been started).
+<p>You may observe that,
+in comparison with the
+<span class="nowrap"><code>Basic</code>&#8197;<code>Setup</code></span> view,
+this view offers a selection of many more packages,
+from which you may choose those which you would like to install
+... so many more that,
+to see the entire selection,
+you will need to scroll the list in the upper right window pane;
+if you find this extensive package list to be too confusing,
+you may refine the visible selection by clicking on
+any of the subsidiary package categories,
+as shown in the package category tree view,
+in the left hand pane.
+</p>
+<p>As with selection of packages from the
+<span class="nowrap"><code>Basic</code>&#8197;<code>Setup</code></span> view,
+you may elect to install any packages which are visible in the
+<span class="nowrap"><code>All</code>&#8197;<code>Packages</code></span> view,
+making your selection by clicking on the small square button,
+to the left of the name of each chosen package,
+in turn,
+and choosing the <span class="nowrap">
+<code>Mark</code>&#8197;<code>for</code>&#8197;<code>Installation</code></span>
+option from the associated context menu.
+</p>
+</div><!-- ol.setup-steps desc -->
+</li>
+<div class="step-ref" id="step-2-iii"></div>
+<li><img src="https://static-cdn.osdn.net/thumb/g/7/714/800x600_0.png"
+ alt="Installer &mdash; Apply Changes View"
+/><div class="desc">
+Once you have made a selection of packages to be installed,
+from either the
+<span class="nowrap"><code>Basic</code>&#8197;<code>Setup</code></span> view,
+or the
+<span class="nowrap"><code>All</code>&#8197;<code>Packages</code></span> view,
+as described above,
+you must commit this selection,
+to complete your installation,
+by proceeding as follows:&ndash;
+<ol>
+<li>Open the <code>Installation</code> menu,
+(on the menu bar),
+and select the
+<span class="nowrap"><code>Apply</code>&#8197;<code>Changes</code></span> option;
+(this will open a dialogue,
+similar to that shown to the right).</li>
+<li>Review the schedule of pending installation actions,
+(noting that you may need to scroll the lists of packages for which deletion,
+upgrade, or installation actions have been scheduled,
+for any of these lists which includes more than six package entries),
+then choose <em>one</em>&hairsp; of:&ndash;
+<ul>
+<li>Click the <code>Apply</code> button,
+to complete <em>all</em> scheduled actions,
+update indicated installation status,
+clear the schedule of pending actions,
+and return to the selection phase of installation,
+to allow initiation of a further package selection.</li>
+<li>Click the <code>Defer</code> button,
+if you would like to modify your package selection;
+this will take you back to the package selection phase of installation,
+to allow you to make your desired changes.</li>
+<li>Click the <code>Discard</code> button,
+if you do <em>not</em>&hairsp; wish to commit <em>any</em>&hairsp;
+of the scheduled changes;
+this will clear your active package selection,
+then return you to the package selection phase of installation,
+whence you may start the installation process again.</li>
+</ul></ol>
+</div><!-- ol.setup-steps desc -->
+</li>
+<li><div class="desc">
+After you have completed your selection of packages,
+and you have committed all of the changes which are needed to install them,
+you may quit from <code>mingw&#8209;get</code>,
+either by selecting the <code>Quit</code> option
+from the <code>Installation</code> menu,
+or by simply closing the <span class="nowrap">
+&#8220;MinGW&#8197;Installation&#8197;Manager&#8221;</span> GUI window.
+Having done so,
+and in particular,
+if you have just completed a first&#8209;time installation,
+you may need to perform some post&#8209;installation system configuration,
+as described in the following section,
+to make your installation work.
+<p style="display: none">
+At this point,
+if you plan to use the MSYS command line interpreter system,
+your MinGW installation should be ready to use;
+however,
+if you choose to use MinGW from Microsoft&#8217;s
+<span class="nowrap">&#8220;command&#8197;prompt&#8221;</span>
+console subsystem,
+then you may need to complete the
+<a href="#post-install">MinGW post&#8209;installation steps</a>
+as <a href="#post-install">described below</a>.
+</p>
+</div><!-- ol.setup-steps desc -->
+</li></ol>
+</div><!-- install-packages -->
+
+<div style="clear: both"></div>
+<div class="overlapped" id="post-install">
+<h3>Post&#8209;Installation Requirements for Use of the MinGW Compiler Suite</h3>
+<p>As noted above,
+the process of installation alone
+is likely to be insufficient to acquire a working MinGW system:
+some additional one&#8209;time system configuration is usually required.
+</p>
+<p>Although some users may choose
+to use an integrated development environment (IDE),
+it is important to understand that, fundamentally,
+MinGW applications are intended for deployment
+using a command line interface (CLI);
+the scope of the necessary system configuration
+is dependent on <em>your</em>&hairsp; choice of infrastructure,
+for provision of a suitable CLI,
+or IDE.
+Some choices,
+which you may wish to consider,
+include:&ndash;
+</p>
+<ol class="config-options">
+<li>Run the MinGW tools <em>directly</em>,&hairsp;
+using Microsoft&#8217;s <code>cmd.exe</code> interpreter,
+within the MS&#8209;Windows default <span class="nowrap">
+&#8220;<code>Command</code>&#8197;<code>Prompt</code>&#8221;
+</span> console host.
+If you choose this option,
+(which may <em>not</em>&hairsp; be the most appropriate choice),
+you will, at least, need to ensure that the MinGW tools can be found
+in the <code>cmd.exe</code> executable search <code>PATH</code>,
+as configured in the process environment.
+The default system configuration will not normally support
+this capability, without making an appropriate <code>PATH</code> adjustment;
+to check if any such adjustment is necessary:&ndash;
+<ul>
+<li>Open a <code>Command</code>&#8197;<code>Prompt</code> console,
+and run the command:
+<pre class="vt box-out">
+C:\Users\me&gt; <kbd>gcc --version</kbd>
+</pre>
+If this results in output similar to:
+<pre class="vt box-out">
+C:\Users\me&gt; <kbd>gcc --version</kbd>
+gcc (MinGW GCC Build-2) 9.2.0
+Copyright (C) 2019 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+</pre>
+then it appears that your process <code>PATH</code> setting
+<em>is already</em>&hairsp; suitably configured,
+and <em>no further</em>&hairsp; configuration is needed;
+however, if the output resembles:
+<pre class="vt box-out">
+C:\Users\me&gt; <kbd>gcc --version</kbd>
+'gcc' is not recognized as an internal or external command,
+operable program or batch file.
+</pre>
+this, then the <code>PATH</code> setting in the process environment
+<em>is not</em>&hairsp; suitably configured;
+you <em>should</em>&hairsp; modify the environment configuration,
+as advised below.
+</li></ul>
+<p>If the preceding check indicates that
+the <code>PATH</code> configuration needs to be adjusted,
+then you should proceed as follows:&ndash;
+</p><ul>
+<li>From the system <span class="nowrap">
+<code>Control</code>&#8197;<code>Panel</code></span>,
+open the <code>System</code> tab,
+access the <span class="nowrap">
+<code>Advanced</code>&#8197;<code>system</code>&#8197;<code>settings</code>
+</span> dialogue,
+and click the <span class="nowrap">
+<code>Environment</code>&#8197;<code>Variables</code></span> button.
+</li>
+<li>In the dialogue,
+which should now have become active,
+observe that there are two categories of environment variables,
+viz. a category for user&#8209;specific variables,
+and another for system (global) variables.
+Please note that any environment variables,
+which you either add, or modify, in either of these categories,
+will be recorded in the system registry,
+and will become visible to <em>all</em>&hairsp; processes
+which are subsequently invoked on the system,
+(although visibility of those in the user&#8209;specific category
+will be restricted to processes owned by the currently&#8209;logged&#8209;in
+user), and that changes to the <code>PATH</code> variable have potential
+to introduce system security vulnerabilities;
+thus, you should exercise caution,
+when making such changes, and,
+unless it is your intention that your changes should affect
+<em>all users</em>&hairsp; of the system,
+you should prefer to make the change <em>only</em>&hairsp;
+in the user&#8209;specific category,
+in order to limit the potential of any vulnerability.
+</li>
+<li>Note that <code>mingw&#8209;get</code> will have installed
+MinGW applications into <code>C:\MinGW\bin</code>,
+(with substitution of any alternative installation&#8209;root path name,
+which you may have chosen at installation time,
+for the <code>C:\MinGW</code> prefix);
+it is this equivalent for the <code>C:\MinGW\bin</code> path name,
+(with prefix substitution as may be appropriate),
+which you must now incorporate into the <code>PATH</code> variable,
+to be passed in the environment,
+to your <span class="nowrap">
+<code>Command</code>&#8197;<code>Prompt</code></span> process.
+</li>
+<li>Within the environment variables category
+in which you have decided to adjust the <code>PATH</code> setting,
+identify the entry (matching the variable name
+<em>case&#8209;insensitively</em>&hairsp;),
+if it exists, for the <code>PATH</code> variable definition.
+</li>
+<li>If the <code>PATH</code> variable definition <em>does</em>&hairsp;
+already exist, select it, and click the <code>Edit</code> button;
+move the input cursor to the <em>end</em>&hairsp; of the
+<code>Value</code> field,
+and append a semicolon (&#8220;<code>;</code>&#8221;),
+followed by your equivalent for <code>C:\MinGW\bin</code>,
+with prefix substitution as required.
+</li>
+<li>Conversely, if no such <code>PATH</code> variable exists,
+click the <code>New</code> button, and create a new entry for it;
+assign your equivalent for <code>C:\MinGW\bin</code>,
+with prefix substitution as required,
+as its value.
+</li>
+<li>Click the <code>OK</code> button on each nested dialogue box,
+as you walk focus back to the top level of the <span class="nowrap">
+<code>Control</code>&#8197;<code>Panel</code></span>,
+so saving your environment variable changes,
+then dismiss the <span class="nowrap">
+<code>Control</code>&#8197;<code>Panel</code></span> itself.
+</li></ul>
+<p>After you have completed the above system configuration steps,
+you may open a standard MS&#8209;Windows <span class="nowrap">
+<code>Command</code>&#8197;<code>Prompt</code></span> console session,
+and you <em>should</em>&hairsp; find that your MinGW tools will work,
+without further ado.
+</p></li>
+<li>As a (possibly better) alternative to option
+<span class="smaller">1</span>,
+you may still choose to run the MinGW tools directly from
+Microsoft&#8217;s <code>cmd.exe</code> command line interpreter,
+but with this interpreter hosted within a console session which has
+been started from a customized &#8220;shortcut&#8221;,
+which itself addresses the issue of adding the equivalent of
+<code>C:\MinGW\bin</code> to the <code>PATH</code>
+environment variable setting;
+this ensures that the modified <code>PATH</code> setting is visible
+<em>only</em>&hairsp; to processes which are invoked from within
+the hosting console session itself, and thus
+<em>significantly</em>&hairsp; reduces any associated potential
+for exposure to system security vulnerability exploits.
+<p>To implement this <code>PATH</code> configuration technique:&ndash;
+</p><ul>
+<li>Create a new &#8220;shortcut&#8221;,
+ideally within the <code>MinGW</code> subdirectory
+(folder) of your user&#8209;specific
+<span class="nowrap"><code>Start</code>&#8197;<code>Menu</code></span>,
+(or, if preferred, in the <code>MinGW</code> subdirectory of the
+<span class="nowrap"><code>All</code>&#8197;<code>Users</code></span>
+<span class="nowrap"><code>Start</code>&#8197;<code>Menu</code></span>,
+noting that you may need to create the respective <span class="nowrap">
+<code>"Start</code>&#8197;<code>Menu\MinGW"</code></span> subdirectory,
+if it does not already exist);
+you should name this new &#8220;shortcut&#8221; as
+<span class="nowrap"><code>"MinGW</code>&#8197;<code>Prompt.lnk"</code>,</span>
+<span class="nowrap"><code>"MinGW</code>&#8197;<code>Console.lnk"</code>,</span>
+or any similar alternative name of your own choice.
+<li>Set the <code>Target</code> of your new &#8220;shortcut&#8221; to:
+<pre class="vt box-out">
+<kbd>%comspec% /k path %PATH%;C:\MinGW\bin</kbd>
+</pre>
+(with substitution for <code>C:\MinGW</code>, as appropriate,
+if you chose an alternative prefix at installation time).
+Alternatively, create a new MS&#8209;Windows batch file,
+(called <span class="nowrap"><code>C:\MinGW\mingw.bat</code>,</span>
+for example), within which the:
+<pre class="vt box-out">
+<kbd>path %PATH%;C:\MinGW\bin</kbd>
+</pre>
+<code>PATH</code> augmentation command is executed,
+and set the &#8220;shortcut&#8221; <code>Target</code> to:
+<pre class="vt box-out">
+<kbd>%comspec% /k C:\MinGW\mingw.bat</kbd>
+</pre>
+(This latter alternative offers greater flexibility than the former,
+insofar as the batch file may be modified to accommodate configuration
+options beyond the minimally required <code>PATH</code> augmentation).
+</li>
+<li>Access the properties of the new &#8220;shortcut&#8221;,
+and set the start&#8209;up directory path name, within the
+<span class="nowrap"><code>Start</code>&#8197;<code>in</code></span>
+field, to select any appropriate directory of your choice;
+if you wish to reproduce the behaviour of the standard MS&#8209;Windows
+<span class="nowrap"><code>Command</code>&#8197;<code>Prompt</code>,</span>
+the appropriate assignment is:
+<pre class="vt box-out">
+<kbd>%HOMEDRIVE%%HOMEPATH%</kbd>
+</pre>
+At the same time,
+you may wish to take the opportunity to tweak &#8220;shortcut&#8221;
+properties on the <code>Font</code>, <code>Layout</code>,
+and <code>Colors</code> tabs.
+</li></ul></li>
+<li>If you chose to install MSYS,
+and you would like to use it as your working MinGW development environment,
+in preference to the rather more limited capabilities of the MS&#8209;Windows
+<span class="nowrap"><code>Command</code>&#8197;<code>Prompt</code>,</span>
+then some associated configuration checks are recommended:&ndash;
+<ul>
+<li>Firstly,
+you may need to create a &#8220;shortcut&#8221;,
+ideally within your user&#8209;specific
+<span class="nowrap"><code>Start</code>&#8197;<code>Menu</code>,</span>
+or within the
+<span class="nowrap"><code>All</code>&#8197;<code>Users</code>,</span>
+<span class="nowrap"><code>Start</code>&#8197;<code>Menu</code>;</span>
+the recommended name for this &#8220;shortcut&#8221; is
+<span class="nowrap"><code>MinGW</code>&#8197;<code>Shell</code>,</span>
+and its <code>Target</code> should be set to invoke:
+<pre class="vt box-out">
+<kbd>C:\MinGW\MSYS\1.0\msys.bat</kbd>
+</pre>
+(with the path name adjusted, as may be required,
+to represent the actual installed location of <code>msys.bat</code>).
+</li>
+<li>Secondly,
+your MSYS installation <em>must</em>&hairsp; be given an appropriate
+hint to the base location of your MinGW tools.
+This is established by means of a &#8220;mount&nbsp;point&#8221;
+specification, within the <span class="nowrap">
+<code>C:\MinGW\MSYS\1.0\etc\fstab</code></span> file,
+(again, with the <span class="nowrap"><code>C:\MinGW\MSYS\1.0</code></span>
+path name adjusted to match the prefix,
+in the actual location of the <code>msys.bat</code> file);
+if this file does not exist, you should create it,
+but in any case, you <em>must</em>&hairsp; ensure that it
+includes (at least) a line of the form:
+<pre class="vt box-out">
+<kbd>C:/MinGW	/mingw</kbd>
+</pre>
+(again noting that the <code>C:/MinGW</code> prefix should be adjusted
+to match any alternative, which you may have chosen at installation time,
+and furthermore, &#8220;<code>/</code>&#8221; characters should be used
+as directory name separators, in preference to &#8220;<code>\</code>&#8221;
+characters, within the <code>etc/fstab</code> file).
+</li></ul>
+<p>You may be wondering why these post&#8209;installation instructions,
+for MSYS, do not refer to <code>PATH</code> configuration.
+In practice, no specific configuration is necessary, because,
+provided the <code>/mingw</code> &#8220;mount&#8209;point&#8221;
+is correctly specified in the <code>fstab</code> file,
+MSYS will correctly deduce the required <code>PATH</code> setting,
+when any shell session is started.
+However, it <em>is</em>&hairsp; important to note that it is
+<em>imperative</em>&hairsp; that <em>no white&#8209;space</em>&hairsp;
+is present, within the absolute path name specification for the
+&#8220;mount&#8209;point&#8221;;
+thus, since this <em>must</em>&hairsp; be specified as
+an <em>absolute</em>&hairsp; path name, if,
+contrary to offered advice,
+you have chosen an installation directory with white&#8209;space
+in its absolute path name,
+you will need to determine the short (8.3) form of your
+installation path name,
+and use that in the &#8220;mount&#8209;point&#8221; specification.
+</p></li>
+<li>Regardless of whether you choose to run the MinGW tools
+within an MSYS session, or within a <code>cmd.exe</code> session, by default,
+either of these will run within an MS&#8209;Windows console host
+container.
+If you prefer, you may choose an alternative container, such as
+<a target="_blank" rel="noopener noreferrer" href="https://conemu.github.io">
+ConEmu</a>,
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/bozho/console">
+Console2</a>, or
+<a target="_blank" rel="noopener noreferrer" href="https://github.com/cbucher/console">
+ConsoleZ</a>.
+While it should be feasible to use any of these,
+each will have its own configuration considerations,
+which are beyond the scope of this HOWTO document.
+</li>
+<li>Alternatively,
+you may decide that you would prefer to deploy MinGW within an IDE.
+Please be aware that MinGW.OSDN offers no formal support for any such
+deployment; however, users have reported success with
+<a target="_blank" rel="noopener noreferrer" href="https://www.codeblocks.org">
+Code::Blocks</a>, and with
+<a target="_blank" rel="noopener noreferrer" href="https://www.eclipse.org">
+Eclipse</a>,
+(but be advised that these third&#8209;party websites may
+may exhibit out&#8209;of&#8209;date references to MinGW download sites;
+the most up&#8209;to&#8209;date downloads of MinGW are <em>always</em>&hairsp;
+available from <a target="_blank" rel="noopener noreferrer"
+href="https://osdn.net/projects/mingw/">OSDN.net</a>).
+As with option <span class="smaller">4</span>,
+each of these IDEs will be subject to its own configuration considerations,
+which, once again, are beyond the scope of this HOWTO document.
+</li></ol>
+</div><!-- post-install -->
+
+<div style="clear: both"></div>
+<div class="overlapped" id="maintenance">
+<h3>Maintaining Currency of your MinGW Installation</h3>
+<p>After you have installed your initial choice of MinGW,
+and/or MSYS packages,
+you will eventually discover that you need to perform some degree
+of maintenance of your installation;
+this need may be prompted by:&ndash;
+</p><ul>
+<li>A desire to install additional packages,
+which you had not chosen to include within your original installation.
+</li>
+<li>Availability of newer releases of those packages,
+which you have previously installed;
+you will wish to upgrade your existing installation,
+to take advantage of any such newer package releases.
+</li>
+</ul>
+<p>Regardless of your motivation
+for performing maintenance on your MinGW installation,
+it is recommended that you use <code>mingw&#8209;get</code>,
+either in its GUI, or in its CLI mode of operation,
+to achieve your objective.
+</p>
+<p>Whether your intention is to install a new package,
+or simply to upgrade an installed package to a newer release,
+you should ensure that the package information records, within
+your locally installed copy of <code>mingw&#8209;get</code>,
+are kept up&#8209;to&#8209;date with respect to the state of
+the online package repositories.
+To achieve this,
+you are advised to periodically,
+(say, if it has been more than a week since your update),
+request an update of your local copy of the package catalogue,
+<em>before</em>&hairsp; you embark on any package installation,
+or package upgrade activity.
+You may accomplish this, either:&ndash;
+</p><ul>
+<li>From the <code>mingw&#8209;get</code> GUI,
+by selecting the <span class="nowrap">
+<code>Update</code>&#8197;<code>Catalogue</code></span> option
+from the <code>Installation</code> menu.
+<li>From the MinGW CLI, simply by running the command:
+<pre class="vt box-out">
+C:\Users\me&gt; <kbd>mingw-get update</kbd>
+</pre>
+</li></ul>
+<p>After updating your package catalogue,
+to synchronize with the online package repository state,
+you may install further packages:&ndash;
+</p><ul>
+<li>From the <code>mingw&#8209;get</code> GUI,
+by following the procedure described in <a href="#install-packages">
+section <span class="smaller">2</span>, above</a>.
+</li>
+<li>From the MinGW CLI, by running the command:
+<pre class="vt box-out">
+C:\Users\me&gt; <kbd>mingw-get install</kbd> &lt;<em>package-name</em>&gt;
+</pre>
+</li></ul>
+<p>When a new version of any package,
+which you have already installed, is released,
+you will want to upgrade your installation,
+to incorporate the package changes.
+Once again, you can perform the upgrade from either
+the <code>mingw&#8209;get</code> GUI,
+or the MinGW CLI;
+the simplest procedure,
+which will upgrade <em>all</em>&hairsp; installed packages,
+for which new releases are available,
+<em>en masse</em>,&hairsp; is&ndash;
+</p><ul>
+<li>From the <code>Installation</code> menu of
+the <code>mingw&#8209;get</code> GUI,
+select the <span class="nowrap">
+<code>Mark</code>&#8197;<code>All</code>&#8197;<code>Upgrades</code>
+</span> option, followed by the <span class="nowrap">
+<code>Apply</code>&#8197;<code>Changes</code>,</span>
+then review, and commit the changes,
+following the procedure described in
+<a href="#step-2-iii">section <span class="smaller">2</span>, step iii</a>,
+above.
+</li>
+<li>From the MinGW CLI, execute the command:
+<pre class="vt box-out">
+C:\Users\me&gt; <kbd>mingw-get upgrade</kbd>
+</pre>
+(without <em>any</em>&hairsp; <span class="nowrap">
+<code>&lt;<em>package-name</em>&gt;</code></span> argument);
+this CLI method performs <em>identically</em>&hairsp; the same
+<em>en masse</em>&#8209; upgrade as the GUI method, <em>except</em>&hairsp;
+that it offers <em>no opportunity</em>&hairsp; for review of the scheduled
+changes, prior to <em>unconditionally</em>&hairsp; committing them.
+</li></ul>
+<p>Alternatively,
+you may choose to perform a <em>selective</em>&hairsp; upgrade
+of individual packages:&ndash;
+</p><ul>
+<li>In the <code>mingw&#8209;get</code> GUI,
+by selecting the <span class="nowrap">
+<code>Mark</code>&#8197;<code>for</code>&#8197;<code>Upgrade</code>
+</span> option, in the context menu which is attached to the status icon
+to the left of the package list entry for each package of interest;
+(those packages, for which upgrades are available, are identified
+by a yellow star, in the upper right corner of the status icon).
+<p>After selecting packages to upgrade,
+once again select the <span class="nowrap">
+<code>Apply</code>&#8197;<code>Changes</code></span> option
+from the <code>Installation</code> menu,
+and proceed as in <a href="#step-2-iii">
+section <span class="smaller">2</span>, step iii</a>.
+</p></li>
+<li>From the MinGW CLI, execute the command:
+<pre class="vt box-out">
+C:\Users\me&gt; <kbd>mingw-get upgrade</kbd> &lt;<em>package-name</em>&gt;
+</pre>
+for each package which you wish to upgrade,
+(which will also, implicitly, identify each additional upgradeable package
+upon which each specified package is dependent).
+</li></ul>
+</div><!-- maintenance -->
+</div><!-- h3-numbered -->
+
+<!-- $RCSfile$: end of file -->
