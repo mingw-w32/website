@@ -1,0 +1,200 @@
+<!DOCTYPE HTML><!--
+ *
+ * exesize.html
+ *
+ * HOWTO avoid production of excessively large executable files.
+ *
+ *
+ * $Id$
+ *
+ * Written by Keith Marshall <keith@users.osdn.me>
+ * Copyright (C) 2008, 2021, MinGW.OSDN Project
+ *
+ *
+ * Redistribution and use in source and 'compiled' forms (SGML, HTML,
+ * PDF, PostScript, RTF, etc) with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer as
+ *    the first lines of this file, unmodified.
+ *
+ * 2. Redistributions in compiled form (transformed to other DTDs,
+ *    converted to PDF, PostScript, RTF and other formats) must
+ *    reproduce the above copyright notice, this list of conditions
+ *    and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS DOCUMENTATION IS PROVIDED BY THE MINGW.OSDN PROJECT "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE MINGW.OSDN PROJECT, OR
+ * ITS CONTRIBUTORS, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ *
+ *
+ * Note: this page assumes browser support for the following numeric
+ * HTML entity codes:
+ *
+ *    &#8197;   fixed width 1/4 em space
+ *    &#8209;   non-breaking hyphen
+ *    &#8216;   typographic left (opening) single quote
+ *    &#8217;   typographic apostrophe/right (closing) single quote
+ *    &#8220;   typographic left (opening) double quote
+ *    &#8221;   typographic right (closing) double quote
+ *
+-->
+<script class="masthead">
+/* Script fragment, to assign titles specific to this page; this is
+ * encapsulated within the "masthead", where such titles are displayed,
+ * to ensure that whatever page content may follow will be correctly
+ * positioned, relative to the masthead content.
+ */
+ set_page("title", "MinGW Compiler Suite User Guide");
+ set_page("subtitle", "HOWTO Reduce the Size of MinGW Executable Files");
+</script><!-- masthead -->
+<div class="masthead" style="display: none">
+<p class="byline">Posted: 21-Oct-2008, by mingwadmin; Last Update: 22-Nov-2021</p>
+</div><!-- masthead -->
+<div class="overlapped" id="introduction">
+<h3>Introduction</h3>
+<p>There are a number of reasons why object files,
+executable files,
+and libraries may be larger than expected;
+principal among these are:
+</p>
+<ul>
+  <li>Overheads due to inclusion of debugging information;</li>
+  <li>C++ exception handling and run-time type information overheads;</li>
+  <li>C++ template class,
+    standard template library,
+    and standard C++ library overheads.
+  </li>
+</ul>
+<p>Below,
+we discuss techniques for reducing the impact of these overheads,
+and ultimately,
+a technique for compressing executable files,
+in order to minimize file size.
+</p>
+</div><!-- introduction -->
+
+<div class="overlapped" id="debug-info">
+<h3>Avoiding Inclusion of Debugging Information</h3>
+<p>Perhaps,
+the most common reason for executables being larger than expected,
+is that they include <em>debugging information</em>&hairsp;;
+(this is added to the object modules,
+when source files are compiled with GCC&#8217;s
+&#8220;<code>-g</code>&#8221; option).
+Even when your own source files are compiled
+<em>without</em>&hairsp; the &#8220;<code>-g</code>&#8221; option,
+libraries which are linked into your executable may have been compiled with it;
+(this may be the case,
+even for the system libraries which are distributed with MinGW).
+</p>
+<p>To exclude debugging information from your executable,
+simply use the &#8220;<code>strip</code>&#8221; command to remove it:
+</p>
+<pre class="box-out vt">
+C:\project&gt; <kbd>strip example.exe</kbd>
+</pre>
+<p>Alternatively,
+use GCC&#8217;s &#8220;<code>-s</code>&#8221; option when linking:
+</p>
+<pre class="box-out vt">
+C:\project&gt; <kbd>gcc -s example.o -o example.exe</kbd>
+</pre>
+</div><!-- debug-info -->
+
+<div class="overlapped" id="rtti">
+<h3>Reducing C++ Exception Handling and Run&#8209;Time Type Information Overheads</h3>
+<p>By default,
+when compiling C++ code,
+GCC will compile in support for handling of C++ exceptions,
+and for interpretation of run&#8209;time type information (RTTI).
+</p>
+<p>If your application does not use either of these,
+then you may choose to eliminate the overhead incurred by inclusion
+of the supporting infrastructure code,
+by compiling and linking with GCC&#8217;s
+&#8220;<code>-fno&#8209;exceptions</code>&#8221;,
+and &#8220;<code>-fno&#8209;rtti</code>&#8221; options,
+to eliminate the C++ exception handling,
+and RTTI interpretation overheads,
+respectively.
+</p>
+</div><!-- rtti -->
+
+<div class="overlapped" id="stl">
+<h3>Understanding the Effect of C++ Template Classes and the C++ Standard Library</h3>
+<p>When you use C++ template classes,
+either defined by yourself,
+or imported from the C++ Standard Template Library (STL),
+the compiler generates code separately for each instantiation
+(e.g.&nbsp;<code>vector&lt;int&gt;</code> and <code>vector&lt;string&gt;</code>),
+so the total code size can increase significantly.
+Other elements of the standard C++ library,
+such as <code>iostreams</code> classes,
+exception handling classes,
+and classes such as <code>std::string</code> introduce further overheads,
+which may seem large in comparison to the size of small applications,
+(such as &#8220;<code>Hello World</code>&#8221; type programs).
+</p>
+<p>In practice,
+these overheads are unavoidable;
+however,
+they are generally of constant size,
+and thus,
+will normally not be significant in comparison to the size
+of more realistic (typically larger) C++ application programs.
+</p>
+</div><!-- stl -->
+
+<div class="overlapped" id="upx">
+<h3>Using UPX to Compress Executable Files</h3>
+<p><a rel="noopener noreferrer" target="_blank"
+ href="https://upx.github.io/">UPX (the Ultimate Packer for eXecutables)
+</a>is a tool which,
+notwithstanding the avoidance of undesirable code generator overheads,
+as described above,
+compresses executable files to achieve further reduction of file size.
+It works for the executable file formats of several operating systems,
+including 32&#8209;bit MS&#8209;Windows,
+and is free for use with <em>all</em>&hairsp; applications,
+(even those which are distributed commercially);
+it uses an efficient compression algorithm,
+producing compressed files which remain executable,
+and are rapidly decompressed <em>in&#8209;place</em>,&hairsp;
+when invoked.
+</p>
+<p>For most effective size reduction,
+UPX may deployed using <em>one</em>&hairsp; of the following invocations,
+(acting on the original <em>uncompressed</em>&hairsp;
+<code>example.exe</code>):
+</p>
+<pre class="box-out vt">
+C:\project&gt; <kbd>upx --brute example.exe</kbd>
+C:\project&gt; <kbd>upx --ultra-brute example.exe</kbd>
+C:\project&gt; <kbd>upx --best example.exe</kbd>
+</pre>
+<p>to compress <code>example.exe</code> <em>in&#8209;place</em>.&hairsp;
+(Do note that,
+whereas the in&#8209;place <em>decompression</em>&hairsp; process
+can be performed quite rapidly,
+the <em>compression</em>&hairsp; may require a considerably longer time;
+this is not generally a problem,
+since compression must be performed only once,
+for each newly generated executable file,
+whereas the relatively much quicker decompression must be repeated
+every time such a compressed executable file is run).
+</p>
+</div><!-- upx -->
+
+<!-- $RCSfile$: end of file -->
