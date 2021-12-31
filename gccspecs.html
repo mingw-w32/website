@@ -1,0 +1,1068 @@
+<!DOCTYPE HTML><!--
+ *
+ * gccspecs.html
+ *
+ * HOWTO customize GCC behaviour, by modification of an external
+ * 'specs' file.
+ *
+ *
+ * $Id$
+ *
+ * Written by Keith Marshall <keith@users.osdn.me>
+ * Copyright (C) 2021, MinGW.OSDN Project
+ *
+ *
+ * Redistribution and use in source and 'compiled' forms (SGML, HTML,
+ * PDF, PostScript, RTF, etc) with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer as
+ *    the first lines of this file, unmodified.
+ *
+ * 2. Redistributions in compiled form (transformed to other DTDs,
+ *    converted to PDF, PostScript, RTF and other formats) must
+ *    reproduce the above copyright notice, this list of conditions
+ *    and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS DOCUMENTATION IS PROVIDED BY THE MINGW.OSDN PROJECT "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE MINGW.OSDN PROJECT, OR
+ * ITS CONTRIBUTORS, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ *
+ *
+ * Note: this page assumes browser support for the following numeric
+ * HTML entity codes:
+ *
+ *    &#8197;   fixed width 1/4 em space
+ *    &#8209;   non-breaking hyphen
+ *    &#8216;   typographic left (opening) single quote
+ *    &#8217;   typographic apostrophe/right (closing) single quote
+ *    &#8220;   typographic left (opening) double quote
+ *    &#8221;   typographic right (closing) double quote
+ *
+-->
+<script class="masthead">
+/* Script fragment, to assign titles specific to this page; this is
+ * encapsulated within the "masthead", where such titles are displayed,
+ * to ensure that whatever page content may follow will be correctly
+ * positioned, relative to the masthead content.
+ */
+ set_page("title", "MinGW Compiler Suite User Guide");
+ set_page("subtitle", "HOWTO Customize the Default Behaviour of the MinGW Compiler");
+</script><!-- masthead -->
+<!--<p class="byline">Posted: 2021-07-03, by Keith; Last Update: 2021-07-03</p>-->
+
+<div class="overlapped" id="intro">
+<h3>Introduction</h3>
+<p>The MinGW compiler comprises a comprehensive suite of separate programs,
+intended for deployment as a native compiler, on the Microsoft Windows platform,
+or alternatively, as a cross&#8209;compiler for use on some other platform,
+to create applications for deployment on the native Windows platform.
+In either case, the compiler suite consists of, at least:&ndash;
+</p><ul>
+<li>The GNU Compiler Collection (GCC),
+built either as a fully native suite, or as a cross&#8209;compiler suite,
+with Microsoft Windows as the code&#8209;generator target.
+</li>
+<li>The GNU Binutils suite; this comprises, primarily,
+the GNU assembler, the GNU linker, and the GNU archive librarian,
+accompanied by a small collection of other utility programs,
+also built with Microsoft Windows as the code&#8209;generator target.
+</li>
+<li>The MinGW C runtime libraries,
+(which integrate with Microsoft&#8217;s C runtime library),
+and the MinGW Windows API suite,
+(which integrates with Microsoft&#8217;s core Windows system DLLs).
+</li></ul>
+<p>In addition to the above,
+a native MinGW compiler deployment is accompanied by several other GNU DLLs,
+which are required to support the operation of the compiler itself;
+in the case of a cross&#8209;compiler,
+the function of these additional DLLs is served by equivalents,
+which are native to the platform on which the cross&#8209;compiler is run.
+</p>
+<p>Regardless of whether it is deployed as a native compiler,
+or as a cross&#8209;compiler suite,
+the MinGW compiler, assembler, and linker are normally invoked
+by means of a common <em>driver</em>&hairsp; program;
+in the case of a native compiler,
+this driver program is normally <code>gcc</code>,
+(or <code>g++</code>, when compiling C++ code);
+in the case of a cross&#8209;compiler,
+the corresponding driver programs may be <code>mingw32&#8209;gcc</code>,
+and <code>mingw32&#8209;g++</code>,
+(possibly qualified by an additional prefix,
+to identify the target CPU).
+In either case,
+the driver program determines the sequence of auxiliary programs,
+which are to be executed,
+and the options and file names which are to be passed to them,
+on the basis of:&ndash;
+</p><ul>
+<li>The options, and file names,
+which are specified on the command line
+which invokes the driver program itself.
+</li>
+<li>A collection of &#8216;specs&#8217; strings,
+such as those which are identified in
+<a rel="noopener noreferrer" target="_blank"
+ href="http://gcc.gnu.org/onlinedocs/gcc/Spec-Files.html"
+>the relevant section of the GCC on&#8209;line manual</a>;
+a default set of such &#8216;specs&#8217; strings is
+compiled into the driver programs,
+but the user is permitted to modify, and even add to these,
+and so modify the default behaviour of the compiler.
+</li></ul>
+<p>In this HOWTO,
+we explore the capabilities afforded by &#8216;specs&#8217; string
+modifications, illustrating these capabilities by examples of:&ndash;
+</p><ul>
+<li><a href="#isystem">Adding directories to the include file search path</a>,
+as recommended in the
+&#8220;<a target="_blank" href="index.html?page=isystem.html#third-party"
+>Include File Search Path HOWTO</a>&#8221;,
+as it relates to the use of third&#8209;party libraries with MinGW.
+</li>
+<li><a href="#libpath">Adding directories to the library search path</a>,
+as recommended in the
+&#8220;<a target="_blank" href="index.html?page=libpath.html#customize"
+>Library Search Path HOWTO</a>&#8221;,
+as it relates to the customization of the default library search path.
+</li>
+<li><a href="#msvcrt">Adding support for linking with
+Microsoft&#8217;s non&#8209;free C runtime libraries</a>,
+such as those which are distributed with the
+Microsoft Visual C Compiler suite.
+</li></ul>
+</div><!-- intro -->
+
+<div class="overlapped" id="prep">
+<h3>Preparing the GCC &#8216;specs&#8217; for Customization</h3>
+<p>By default,
+the behaviour of GCC is controlled by
+a collection of &#8216;specs&#8217; strings,
+which are defined at the time when GCC itself is built,
+and are built&#8209;in to the driver program;
+such built&#8209;in &#8216;specs&#8217; strings
+are <em>internally immutable</em>,&hairsp;
+but any of them may be redefined in <em>external</em>&hairsp;
+&#8216;specs&#8217; files,
+thus allowing them to be <em>effectively modified</em>&hairsp;
+at GCC run&#8209;time.
+Thus, it should be evident
+that customization of GCC behaviour will require
+the use of <em>external</em>&hairsp;
+&#8216;specs&#8217; files.
+</p>
+<p>Before we embark on the customization process,
+it may be helpful to clarify some aspects of how GCC interprets,
+&#8216;specs&#8217; files ... an area in which the GCC documentation,
+and its built&#8209;in help are ambiguously vague!
+In particular,
+within the built&#8209;in help:
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc --help</kbd>
+   :
+  -specs=&lt;file&gt;      Override built-in specs with the contents of &lt;file&gt;.
+   :
+</pre>
+<p>this terse description of the <code>-specs</code> option,
+while technically accurate,
+may lead to a misconception that,
+when this option is specified,
+GCC will ignore its built&#8209;in &#8216;specs&#8217;
+<em>in their entirety</em>&hairsp;;
+however, in reality:
+</p><ul>
+<li><em>Before</em>&hairsp; reading <em>any</em>&hairsp; file,
+which has been nominated with the <code>-specs=&lt;file&gt;</code> option,
+GCC <em>will</em>,&hairsp; with <em>just one exception</em>,&hairsp;
+initialize its <em>default &#8216;specs&#8217;</em>&hairsp; state
+to that which is directed by its built&#8209;in &#8216;specs&#8217;.
+</li>
+<li>The <em>one exception</em>&hairsp; to the preceding initialization
+arises when an <em>external</em>&hairsp; &#8216;specs&#8217; file,
+<em>explicitly</em>&hairsp; named &#8220;specs&#8221;,
+is present: in this case,
+GCC <em>will</em>&hairsp; ignore its built&#8209;in &#8216;specs&#8217;,
+and will read its default &#8216;specs&#8217; state from this file instead.
+This explicitly named &#8216;specs&#8217; file need <em>not</em>&hairsp; be
+invoked by means of a <code>-specs=specs</code> option; (indeed,
+if it is, it will be read <em>twice</em>,&hairsp;
+the effect of which is unlikely to be desired).
+</li>
+<li>Only <em>after</em>&hairsp;
+its default &#8216;specs&#8217; state has been initialized,
+will GCC read <em>any</em>&hairsp; &#8216;specs&#8217; file
+which has been nominated by means of
+a <code>-specs=&lt;file&gt;</code> option.
+Each &#8216;specs&#8217; file so nominated,
+(more than one is permitted, in which case they will be read
+in strictly left&#8209;to&#8209;right order, as nominated),
+will <em>augment</em>&hairsp; the prevailing &#8216;specs&#8217; state,
+(as it has been established at the time when each file is read);
+augmentation may:
+<ol style="list-style: lower-roman">
+<li><em>Add</em>&hairsp;
+new <em>custom</em>&hairsp; &#8216;specs&#8217; strings.
+</li>
+<li><em>Redefine</em>&hairsp;
+any <em>existing</em>&hairsp; &#8216;specs&#8217; string,
+<em>in its entirety</em>&hairsp;;
+(such redefinition <em>does</em>&hairsp; have the effect of
+<em>overriding</em>&hairsp; each redefined &#8216;specs&#8217; string,
+but the effect is <em>selective</em>&hairsp;).
+</li>
+<li><em>Append</em>&hairsp; additional text
+to any <em>existing</em>&hairsp; &#8216;specs&#8217; string;
+(this <em>modifies</em>&hairsp; the affected &#8216;specs&#8217; string,
+but does not, strictly speaking, <em>override</em>&hairsp; it).
+</li>
+<li><em>Delete</em>&hairsp;
+any <em>existing</em>&hairsp; &#8216;specs&#8217; string.
+</li></ol>
+<li>Compilation ultimately proceeds
+with whatever &#8216;specs&#8217; state prevails,
+after all applicable customizations have been processed.
+</li></ul>
+<p>Having established an understanding of
+how GCC processes &#8216;specs&#8217; files,
+we may now progress to development of our customization strategy.
+First we must decide, in the case of each planned customization,
+whether we would like it to affect <em>every</em>&hairsp; GCC invocation,
+or if it should be subject to selection,
+by specification of a <code>-specs=&lt;file&gt;</code> option.
+In the former case,
+the customization should be applied in a &#8216;specs&#8217; file
+which overrides all of the built&#8209;in &#8216;specs&#8217;,
+(i.e.&nbsp;in a file named &#8220;specs&#8221;);
+in the latter, a selective customization
+(in a file with any user-chosen name other than &#8220;specs&#8221;)
+may be more appropriate.
+</p>
+<p>Regardless of how any required &#8216;specs&#8217; files are to be named,
+they <em>must</em>&hairsp; be installed at an appropriate location within the
+GCC installation directory hierarchy;
+the appropriate directory path name may be identified,
+(as in this example for a MinGW installation of GCC-3.4.5),
+by running the command:
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -print-libgcc-file-name</kbd>
+c:/mingw/bin/../lib/gcc/mingw32/3.4.5/libgcc.a
+</pre>
+<p>and discarding the final file name component of the path name,
+to obtain a directory path name resembling
+<code>c:/mingw/bin/../lib/gcc/mingw32/3.4.5</code>.
+</p>
+<p>Note: if you are running this
+in an MSYS (or other POSIX&#8209;compatible) shell,
+and assuming that the <code>sed</code> utility program is installed,
+you may wish to use it, in an adaptation of the preceding command,
+to obtain the requisite directory path name directly,
+expressing it in canonical form):
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -print-libgcc-file-name | sed 's!/[^/]*$!!;:1;s![^/][^/]*/\.\./!/!;t 1'</kbd>
+c:/mingw/lib/gcc/mingw32/3.4.5
+</pre>
+<p>Alternatively, in Microsoft&#8217;s <code>cmd.exe</code> shell,
+with a suitable POSIX&#8209;compatible <code>sed</code> utility program available,
+you may use the same adaptation of the command,
+<em>except</em>&hairsp; that you <em>must</em> substitute double quotes,
+in place of the single quotes:
+</p>
+<pre class="vt box-out">
+C:\&gt; <kbd>gcc -print-libgcc-file-name | sed "s!/[^/]*$!!;:1;s![^/][^/]*/\.\./!/!;t 1"</kbd>
+c:/mingw/lib/gcc/mingw32/3.4.5
+</pre>
+<p>If you plan to apply any customizations
+which you wish to take effect <em>every</em>&hairsp; time you run GCC,
+(i.e.&nbsp;<em>without</em>&hairsp; requiring
+a <code>-specs=&lt;file&gt;</code> option),
+then you <em>must</em>&hairsp; apply those customizations
+within a &#8216;specs&#8217; file which is
+<em>explicitly</em>&hairsp; named &#8220;specs&#8221;,
+in the directory which you have just identified,
+as described above.
+If such a &#8216;specs&#8217; file already exists,
+then you are good to go;
+back it up,
+(in case you need to revert it ...  a mistake in customization
+could break GCC in some &#8220;interesting&#8221; way),
+then proceed to edit it,
+to apply your chosen customizations.
+Conversely, if no file named &#8220;specs&#8221; yet exists,
+in the appropriate directory,
+you must create it.
+Ideally, you should start from a baseline which <em>exactly</em> reproduces
+GCC&#8217;s built&#8209;in &#8216;specs&#8217;;
+you may create, (or subsequently revert to), such a baseline,
+by running the command:
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -dumpspecs &gt; c:/path/to/libgcc/dir/specs</kbd>
+</pre>
+<p>where <code>/path/to/libgcc/dir</code> represents the path
+to the directory in which <code>libgcc.a</code> is installed,
+as you have identified previously, from the output of the
+<span class="nowrap"><code>gcc -print-libgcc-file-name</code></span> command;
+(thus, by extension of the earlier example, you would execute):
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -dumpspecs &gt; c:/mingw/lib/gcc/mingw32/3.4.5/specs</kbd>
+</pre>
+</div><!-- prep -->
+
+<div class="overlapped" id="isystem">
+<h3>Defining a Custom Include File Search Path</h3>
+<p>As noted in the
+&#8220;<a target="_blank" href="index.html?page=isystem.html"
+>Include File Search Path HOWTO</a>&#8221;,
+if a <code>mingw32</code> build of GCC had been
+configured to run on a typical Unix system,
+it might be expected to search for include files
+in <code>/usr/local/include</code>,
+some GCC and <code>mingw32</code> specific directories,
+and <code>/usr/include</code>.
+</p>
+<p>On its native MS&#8209;Windows host,
+when installed at its default file system location of <code>C:/MinGW</code>,
+it may seem reasonable to consider that <code>C:/MinGW</code> could be used
+as a representative equivalent of the <code>/usr</code> directory
+of the typical Unix system; thus,
+<code>C:/MinGW/local/include</code> would be equivalent to
+the Unix system&#8217;s <code>/usr/local/include</code> directory.
+However, in a standard <code>mingw32</code> build of GCC,
+<code>C:/MinGW/local/include</code> is conspicuously <em>omitted</em>&hairsp;
+from the configured include file search path.
+</p>
+<p>On a Unix system,
+the <code>/usr/local/lib</code> file system hierarchy
+would typically be used to segregate third&#8209;party,
+locally installed libraries, from the core system libraries,
+with the corresponding header files,
+associated with such locally installed libraries,
+being placed into the file system hierarchy
+below <code>/usr/local/include</code>.
+From a system management perspective,
+this segregation is very convenient;
+the absence of a similar file system infrastructure,
+in a standard MinGW installation,
+introduces an inconvenience which we would like to mitigate.
+</p>
+<p>Of course,
+having created a supporting directory structure,
+and installed our third&#8209;party header files within it,
+we can <em>always</em>&hairsp; instruct GCC to search for them by specifying
+<code>-I...</code>, <code>-isystem</code>&puncsp;<code>...</code>,
+or even <code>-iquote</code>&puncsp;<code>...</code> options to GCC commands,
+or by specifying <code>CPATH=...</code>, <code>C_INCLUDE_PATH=...</code>,
+<code>CPLUS_INCLUDE_PATH=...</code>, or <code>OBJC_INCLUDE_PATH=...</code>
+<em>environment variables</em>,&hairsp; as appropriate;
+of more interest here, however,
+is the development of an inconvenience mitigating configuration,
+by means of &#8216;specs&#8217; file customization.
+</p>
+<p>Let us assume that we have created a suitable
+file system hierarchy at <code class="nowrap">C:/MinGW/local</code>,
+and we have installed our third&#8209;party header files
+into <code class="nowrap">C:/MinGW/local/include</code>;
+(we could just as well have chosen a path outside
+the default MinGW installation hierarchy
+.&hairsp;.&hairsp;. say <code class="nowrap">C:/Local/MinGW</code>,
+with header files in
+<code class="nowrap">C:/Local/MinGW/include</code> .&hairsp;.&hairsp;.
+but the principle remains the same;
+we would simply substitute <code class="nowrap">C:/Local/MinGW</code>
+for <code class="nowrap">C:/MinGW/local</code>,
+in &#8216;specs&#8217; file references).
+Given this assumption, as stated,
+our objective will be to customize the GCC &#8216;specs&#8217; state,
+such that <code class="nowrap">C:/MinGW/local/include</code> will be searched,
+as if specified by <code class="nowrap">-isystem C:/MinGW/local/include</code>,
+<em>every</em>&hairsp; time GCC is invoked.
+</p>
+<p>Since we would like this customization to apply for every GCC invocation,
+the most appropriate place to make the necessary changes is in the external
+&#8216;specs&#8217; file which is explicitly named &#8220;specs&#8221;,
+rather than in any which needs to be nominated by specification of
+a <code>-specs=&lt;file&gt;</code> option.
+If this file already exists, make a backup copy of it,
+(in case you mess it up, and need to revert it);
+if it does not yet exist, create it.
+(Please refer to <a href="#prep">the preceding section, within this document</a>,
+for advice on how to locate, or how to create, this &#8220;specs&#8221; file,
+if you do not already know).
+</p>
+<p>Next, open this &#8220;specs&#8221; file
+in your favourite text&#8209;file editor, and add:
+</p>
+<pre class="box-out">
+*local_prefix:
+c:/mingw/local/
+
+*local_includes:
+-I %(local_prefix)include
+
+</pre>
+<p>at (or near) the top of the file,
+taking care to ensure that each of
+these new custom &#8216;specs&#8217; string definitions,
+(while also taking care to preserve the same structure
+for <em>all existing</em>,&hairsp; adjacent definitions),
+comprises <em>exactly</em>&hairsp;:
+</p><ul>
+<li>One line, beginning with an asterisk and ending with a colon,
+specifying the <em>name</em>&hairsp; of of the custom &#8216;specs&#8217;
+string, between these punctuation marks.
+</li>
+<li>One (or more) non&#8209;blank lines,
+specifying the <em>value</em>&hairsp; of the named &#8216;specs&#8217; string.
+</li>
+<li>One final line, to terminate the &#8216;specs&#8217; string definition;
+(this line <em>must</em>&hairsp; be <em>completely empty</em>&hairsp;;
+take care that no white space is accidentally inserted).
+</li></ul>
+<p>Finally,
+to make GCC actually <em>use</em>&hairsp;
+our <code>local_includes</code> definition,
+we must append it to each of GCC's own (existing) <code>ccp</code>,
+and <code>cc1plus</code> definitions.
+While the &#8220;specs&#8221; file is still open,
+in your text&#8209;file editor,
+move to the end of the file,
+and add:
+</p>
+<pre class="box-out">
+*cpp:
++ %(local_includes)
+
+*cc1plus:
++ %(local_includes)
+
+</pre>
+<p>(again,
+taking care to leave the <em>two empty lines</em>,&hairsp;
+as shown),
+before saving the file,
+and quitting from the text&#8209;editor,
+to complete the modification.
+</p>
+<p>Astute readers may have noticed that,
+to the extent to which this &#8216;specs&#8217; file modification uses it,
+our definition of <code>local_prefix</code> is effectively redundant;
+we could just as well have specified the value of
+<code>local_includes</code> <em>directly</em>,&hairsp;
+to be <code class="nowrap">-isystem c:/mingw/local/include</code>,
+and the effect would be the same.
+We have chosen to define <code>local_prefix</code> separately,
+because, as we will see in <a href="#libpath">the next section</a>,
+we will want to define a <code>local_libpath</code> specification,
+relative to the same file system prefix.
+Of course, we could also specify <code>local_libpath</code>
+<em>entirely</em>&hairsp; within a single &#8216;specs&#8217; string,
+(including a duplicate of the prefix from <code>local_includes</code>);
+the advantage of defining <code>local_prefix</code> separately,
+and then relating both <code>local_includes</code>
+and <code>local_libpath</code> to it,
+is that it offers us an option,
+at some unspecified future time,
+to relocate the <em>entire</em>&hairsp; local file system hierarchy,
+(from <code>C:/MinGW/local</code> to <code>C:/Local/MinGW</code>,
+for example), by redefining, or by <em>overriding</em>,&hairsp;
+just the one <code>local_prefix</code> &#8216;specs&#8217; string.
+</p>
+</div><!-- isystem -->
+
+<div class="overlapped" id="libpath">
+<h3>Defining a Custom Library Search Path</h3>
+<p>Further building on the underlying principles of,
+and complementing the customized include file search path configuration,
+as described in <a href="#isystem">the preceding section</a>,
+GCC also needs to be instructed where to search for the associated
+third&#8209;party library files.
+</p>
+<p>By analogy with the customized local include file search path,
+which we have configured as <code>c:/mingw/local/include</code>,
+the logically corresponding local library search path would be
+<code>c:/mingw/local/lib</code>.
+While the &#8220;<a target="_blank" href="index.html?page=libpath.html#customize"
+>Library Search Path HOWTO</a>&#8221; indicates how
+this search path may be specified,
+without recourse to &#8216;specs&#8217; file customization,
+for the additional convenience which it will ultimately afford,
+we are more interested, here, in how to specify this custom search path
+<em>using</em>&hairsp; &#8216;specs&#8217; file customization.
+</p>
+<p>Like the local include file search path configuration,
+this &#8216;specs&#8217; file customization will be most convenient
+if its deployment does <em>not</em>&hairsp; require the use of
+a <code>-specs=&lt;file&gt;</code> command line option.
+So, assuming that you have already followed the preceding procedures,
+to <a href="#prep">provision a primary &#8216;specs&#8217; file</a>,
+(explicitly named &#8220;specs&#8221;),
+and to <a href="#isystem">configure the custom include file search path</a>,
+open this &#8216;specs&#8217; file once again,
+in your favourite text&#8209;file editor;
+locate the definition for <code>local_includes</code>,
+which you added previously, and below it,
+add the definition:
+</p>
+<pre class="box-out">
+*local_libpath:
+-L %(local_prefix)lib
+
+</pre>
+<p>once again, taking care to maintain correct structure,
+both within this new definition, and those adjacent to it.
+</p>
+<p>Finally,
+to complete the configuration,
+and instruct GCC to <em>use</em>&hairsp; this new custom search path,
+go to the end of the file, and add:
+</p>
+<pre class="box-out">
+*link_libgcc:
++ %(local_libpath)
+
+</pre>
+<p>before saving the &#8216;specs&#8217; file,
+and quitting the editor.
+</p>
+</div><!-- libpath -->
+
+<div class="overlapped" id="msvcrt">
+<h3>Supporting Microsoft&#8217;s Non&#8209;Free &#8216;C&#8217; Runtime Libraries</h3>
+<p>By default, the MinGW compiler/linker combination will link applications,
+such that they depend on Microsoft&#8217;s <code>MSVCRT.DLL</code>
+&#8216;C&#8217; runtime library;
+while not strictly &#8220;free&#8221;,
+in the sense defined by the GNU General Public Licence,
+this <em>does</em>,&hairsp; qualify for the GPL linking exemption
+for integration with non&#8209;free software components,
+on the basis that it is distributed, by Microsoft,
+as a standard Windows operating system component.
+</p>
+<p>In addition to <code>MSVCRT.DLL</code>,
+Microsoft also distribute various alternative &#8216;C&#8217; runtime libraries,
+as components of their &#8220;Visual Studio&#8221;, or &#8220;Visual C&#8221;
+software development suites.
+Bearing names such as <span class="nowrap">
+<code>MSVCR70.DLL</code>&hairsp;<code>..</code>&hairsp;<code>MSVCR120.DLL</code>,
+</span>these are <em>not</em>&hairsp; distributed as standard components
+of the Windows operating system;
+thus, they do <em>not</em>&hairsp; qualify for the GPL linking exemption,
+and MinGW.OSDN is <em>not</em>&hairsp; licensed to distribute them.
+</p>
+<p>Notwithstanding the foregoing licensing restrictions on their use,
+the non&#8209;free Microsoft &#8216;C&#8217; runtime libraries
+<em>do</em>&hairsp; introduce a small number of functions,
+which Microsoft have never incorporated into
+<code>MSVCRT.DLL</code>;
+consequently, there may be occasions when users will
+wish to link their MinGW applications with one of these
+non&#8209;free &#8216;C&#8217; runtime libraries.
+While MinGW.OSDN is not licensed to distribute these
+&#8216;C&#8217; runtime libraries,
+in DLL form,
+we <em>can</em>,&hairsp; and <em>do</em>,&hairsp;
+distribute <em>import libraries</em>&hairsp; which map their entry points,
+(at least for <span class="nowrap"><code>MSVCR70.DLL</code>&hairsp;<code
+>..</code>&hairsp;<code>MSVCR100.DLL</code>),</span>
+so that any users who are prepared to handle the licensing implications,
+and the provisioning of the DLLs for themselves,
+may link their MinGW applications with these libraries,
+if they so wish.
+</p>
+<p>Some users may assume, naïvely,
+that linking with, for example <code>MSVCR80.DLL</code>, would be
+as simple as adding the <code>-lmsvcr80</code> library specification
+to the <code>gcc</code> command line;
+unfortunately, it is <em>not</em>&hairsp; as simple as this!
+The problem with this naïve approach is twofold:&ndash;
+</p><ol style="list-style: lower-roman">
+<li>When linking with <code>-lmsvcr80</code>,
+it is <em>also necessary</em>&hairsp; to link with <code>-lmoldname80</code>;
+while it may appear that this would be as simple as
+also adding <code>-lmoldname80</code>,
+this is also the wrong way to accomplish the objective!
+</li>
+<li>The fundamental reason why it is <em>wrong</em>&hairsp; to simply add
+<code class="nowrap">-lmoldname80 -lmsvcr80</code>
+to the <code>gcc</code> command line
+is that the default GCC &#8216;specs&#8217; strings <em>already add</em>&hairsp;
+<code class="nowrap">-lmoldname -lmsvcrt</code>
+to the <em>effective</em>&hairsp; <code>gcc</code> command.
+Thus, by <em>also</em>&hairsp; adding
+<code class="nowrap">-lmoldname80 -lmsvcr80</code>,
+we are asking the linker to search <em>both</em>&hairsp;
+<code>libmoldname80.a</code> <em>and</em>&hairsp; <code>libmoldname.a</code>,
+to resolve <code>OLDNAME</code> symbols,
+<em>and ultimately both</em>&hairsp; <code>libmsvcr80.a</code>
+<em>and</em>&hairsp; <code>libmsvcrt.a</code>,
+to resolve &#8216;C&#8217; runtime DLL references.
+This introduces potential for the linked application to depend on
+<em>both</em>&hairsp; <code>MSVCR80.DLL</code>
+<em>and</em>&hairsp; <code>MSVCRT.DLL</code>,
+which is <em>definitively unsupported</em>&hairsp;;
+at best, you <em>may</em>&hairsp; be lucky, and get away with it;
+more likely, your application will be unstable,
+and may crash and burn at run time,
+with unpredictable side effects.
+</li></ol>
+<p>Thus, we should <em>not</em> simply specify <code>-lmsvcr80</code>,
+(either free&#8209;standing, or accompanied by <code>-lmoldname80</code>),
+to the <code>gcc</code> command line, when our intent is to link with
+<code>MSVCR80.DLL</code>, in preference to <code>MSVCRT.DLL</code>.
+(Nor, following similar reasoning, should we attempt to substitute
+any of Microsoft&#8217;s other non&#8209;free &#8216;C&#8217;
+runtime DLLs, in this manner).
+Rather, we <em>must</em>&hairsp; modify the GCC &#8216;specs&#8217; strings,
+such that <em>all</em>&hairsp; existing references to <code>-lmsvcrt</code>,
+and to <code>-lmoldname</code>, are <em>replaced</em>&hairsp; by
+<code>-lmsvcr80</code> and <code>-lmoldname80</code>, respectively,
+(or whatever alternative references are appropriate,
+for the intended substitute &#8216;C&#8217; runtime DLL).
+Below, we will explore some methods for achieving this objective.
+</p>
+<h4>Identifying the Required &#8216;specs&#8217; String Modifications</h4>
+<p>As we&#8217;ve seen above,
+when we wish to link with any of Microsoft&#8217;s non&#8209;free
+&#8216;C&#8217; runtime libraries,
+we <em>really</em>&hairsp; ought to modify the GCC &#8216;specs&#8217; strings,
+to avoid any conflicting application dependencies on <em>both</em>&hairsp;
+<code>MSVCRT.DLL</code>,
+and the chosen non&#8209;free DLL.
+The default libraries specification,
+for linking with <code>MSVCRT.DLL</code>,
+is <code class="nowrap">-lmoldname -lmsvcrt</code>;
+for linking with any of the non&#8209;free &#8216;C&#8217; runtime DLLs,
+this couplet <em>must</em>&hairsp; be replaced,
+in any &#8216;specs&#8217; string which includes it,
+by an alternative couplet selected from the following table:&ndash;
+</p>
+<table class="borderless">
+  <tr>
+    <th>To Use</th><th>Preprocessor Identification</th><th>Link With Libraries</th>
+    <th>Remarks</th>
+  </tr>
+  <tr class="leaded">
+    <td><code>MSVCRT.DLL</code></td>
+    <td /><td><code class="nowrap">-lmoldname -lmsvcrt</code></td>
+    <td>MinGW default;
+      no preprocessor identification or &#8216;specs&#8217; changes required
+    </td>
+  </tr>
+  <tr><td><code>MSVCR70.DLL</code></td>
+    <td><code>-D__MSVCRT_VERSION__=0x0700</code></td>
+    <td><code class="nowrap">-lmoldname70 -lmsvcr70</code></td>
+  </tr>
+  <tr><td><code>MSVCR71.DLL</code></td>
+    <td><code>-D__MSVCRT_VERSION__=0x0710</code></td>
+    <td><code class="nowrap">-lmoldname71 -lmsvcr71</code></td>
+  </tr>
+  <tr><td><code>MSVCR80.DLL</code></td>
+    <td><code>-D__MSVCRT_VERSION__=0x0800</code></td>
+    <td><code class="nowrap">-lmoldname80 -lmsvcr80</code></td>
+  </tr>
+  <tr><td><code>MSVCR90.DLL</code></td>
+    <td><code>-D__MSVCRT_VERSION__=0x0900</code></td>
+    <td><code class="nowrap">-lmoldname90 -lmsvcr90</code></td>
+  </tr>
+  <tr><td><code>MSVCR100.DLL</code></td>
+    <td><code>-D__MSVCRT_VERSION__=0x1000</code></td>
+    <td><code class="nowrap">-lmoldname100 -lmsvcr100</code></td>
+  </tr>
+  <tr style="display: none"><td><code>MSVCR110.DLL</code></td>
+    <td><code>-D__MSVCRT_VERSION__=0x1100</code></td>
+    <td><code class="nowrap">-lmoldname110 -lmsvcr110</code></td>
+  </tr>
+  <tr style="display: none"><td><code>MSVCR120.DLL</code></td>
+    <td><code>-D__MSVCRT_VERSION__=0x1200</code></td>
+    <td><code class="nowrap">-lmoldname120 -lmsvcr120</code></td>
+  </tr>
+</table>
+<p>Note that,
+in addition to the alternative libraries couplet,
+the foregoing table also specifies a &#8220;<em>preprocessor
+identification</em>&hairsp;&#8221;,
+for all but the default <code>MSVCRT.DLL</code> case.
+This should be <em>added</em> to the
+<code>cpp</code> &#8216;specs&#8217; string,
+as applicable,
+to ensure that definitions associated with the selected non&#8209;free
+runtime library are made visible,
+when the compiler parses the appropriate &#8216;C&#8217; header files.
+</p>
+<h4>A Simplistic Approach to Implementing the &#8216;specs&#8217; Strings Modifications</h4>
+<p>A simple,
+although rather naïve,
+method of implementing the necessary &#8216;specs&#8217; string modifications,
+might be to create a separate copy of the &#8216;specs&#8217; file,
+specific to each non&#8209;free runtime DLL
+which we wish to support.
+For example,
+to support linking with <code>MSVCR80.DLL</code>,
+we might create a copy of an existing external &#8216;specs&#8217; file,
+(in the appropriate &#8216;specs&#8217; file directory),
+naming the copy as <code>msvcr80</code>,
+(or, if we don&#8217;t have an external &#8216;specs&#8217; file,
+use the <code>gcc -dumpspecs</code> command to create <code>msvcr80</code>,
+as described under the heading &#8220;<a href="#prep">Preparing the GCC
+&#8216;specs&#8217; for Customization</a>&#8221;, above).
+</p>
+<p>Once we have created a copy of the &#8216;specs&#8217; file,
+(which we&#8217;ve called <code>msvcr80</code>, in our example case),
+we may edit it, to implement the required customizations.
+First, we should locate the <code>cpp</code> string definition ...
+it should look something like this:
+</p>
+<pre class="box-out">
+*cpp:
+%{posix:-D_POSIX_SOURCE} %{mthreads:-D_MT} %{pthread:-D_REENTRANT} %{!no-pthread: }
+
+</pre>
+<p>or, if we&#8217;ve already added an additional include file search path:
+</p>
+<pre class="box-out">
+*cpp:
+%{posix:-D_POSIX_SOURCE} %{mthreads:-D_MT} %{pthread:-D_REENTRANT} %{!no-pthread: }
+%(local_includes)
+
+</pre>
+<p>to which we must add
+the appropriate <em>preprocessor identification</em>,&hairsp; string,
+selected from the table above,
+(which, in the <code>MSVCR80.DLL</code> case,
+is <code>-D__MSVCRT_VERSION__=0x0800</code>).
+Thus, the modified definition becomes:
+</p>
+<pre class="box-out">
+*cpp:
+%{posix:-D_POSIX_SOURCE} %{mthreads:-D_MT} %{pthread:-D_REENTRANT} %{!no-pthread: }
+-D__MSVCRT_VERSION__=0x0800
+
+</pre>
+<p>or:</p>
+<pre class="box-out">
+*cpp:
+%{posix:-D_POSIX_SOURCE} %{mthreads:-D_MT} %{pthread:-D_REENTRANT} %{!no-pthread: }
+%(local_includes) -D__MSVCRT_VERSION__=0x0800
+
+</pre>
+<p style="margin-top: 0.8em">Second,
+we must locate all occurrences of <code>-lmsvcrt</code>,
+and of <code>-lmoldname</code>,
+and replace each with the corresponding equivalents from the table above,
+(<span class="nowrap">i.e.&#8197;<code>-lmsvcr80</code></span>
+and <code>-lmoldname80</code>, respectively,
+in the case of the <code>MSVCR80.DLL</code> example).
+Typically, each will appear just once,
+with both in the <code>libgcc</code> string definition,
+which initially, should look something like:
+</p>
+<pre class="box-out">
+*libgcc:
+%{mthreads:-lmingwthrd} -lmingw32 -lmingwex -lmingw32 -lmingwex
+%{static|static-libgcc:-lgcc -lgcc_eh} %{!static:%{!static-libgcc:%{!shared:%{!shared-libgcc:-lgcc -lgcc_eh}
+%{shared-libgcc:-lgcc_s -lgcc}} %{shared:-lgcc_s -lgcc}}} -lmoldname -lmsvcrt
+
+</pre>
+<p>and, after modification, should look like this:
+</p>
+<pre class="box-out">
+*libgcc:
+%{mthreads:-lmingwthrd} -lmingw32 -lmingwex -lmingw32 -lmingwex
+%{static|static-libgcc:-lgcc -lgcc_eh} %{!static:%{!static-libgcc:%{!shared:%{!shared-libgcc:-lgcc -lgcc_eh}
+%{shared-libgcc:-lgcc_s -lgcc}} %{shared:-lgcc_s -lgcc}}} -lmoldname80 -lmsvcr80
+
+</pre>
+<p style="margin-top: 0.8em">Finally,
+while these two modifications are sufficient for <code>gcc</code>,
+they will <em>not</em>&hairsp; pass the correct <code>__MSVCRT_VERSION__</code>
+definition for compilation with <code>g++</code>;
+to correct this deficiency,
+we must also modify the <code>cc1plus</code> &#8216;specs&#8217; string,
+(which, unless we've already added anything to it,
+appears to be initially empty, by default), so we define it as:
+<pre class="box-out">
+*cc1plus:
+-D__MSVCRT_VERSION__=0x0800
+
+</pre>
+<p>or, if we had already added, e.g. an additional include files search path:
+</p>
+<pre class="box-out">
+*cc1plus:
+%(local_includes) -D__MSVCRT_VERSION__=0x0800
+
+</pre>
+<p style="margin-top: 0.8em">
+With all three of the above modifications in place,
+in the <code>msvcr80</code> &#8216;specs&#8217; file,
+we may invoke <code>gcc</code>, (or <code>g++</code>), like this:
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -specs=msvcr80 foo.c -o foo.exe</kbd>
+</pre>
+<p>to compile, and link <code>foo.exe</code> with <code>MSVCR80.DLL</code>,
+<em>without</em>&hairsp; incurring any dependency on <code>MSVCRT.DLL</code>.
+However, the naïve simplicity of this &#8216;specs&#8217; strings
+modification technique <em>does</em>&hairsp; make it sub&#8209;optimal,
+and may create potential problems;
+in the following section,
+we will discuss possible improvements to this simple modification technique.
+</p>
+<h4>Improving on the Simplistic &#8216;specs&#8217; Strings Modification Technique</h4>
+<p>The simplistic &#8216;specs&#8217; strings modification technique,
+as described in the preceding section,
+for supporting the use of Microsoft&#8217;s non&#8209;free
+&#8216;C&#8217; runtime DLLs,
+exhibits the following potential disadvantages:&ndash;
+</p><ul>
+<li>Each custom &#8216;specs&#8217; file,
+which relates to any one specific non&#8209;free &#8216;C&#8217; runtime DLL,
+reproduces a redundant copy of <em>every</em>&hairsp; &#8216;specs&#8217; string
+which appears in the set of built&#8209;in &#8216;specs&#8217;,
+(or in an external <code>specs</code> file copy thereof),
+but modifies <em>only two</em>&hairsp; of them.
+An implication of this is that <em>every one</em>&hairsp; of those
+<em>unmodified</em>&hairsp; &#8216;specs&#8217; strings <em>must</em>&hairsp;
+be parsed <em>twice</em>&hairsp;;
+this is <em>grossly inefficient</em>.
+</li>
+<li>The duplication of all of those <em>unmodified</em>&hairsp;
+&#8216;specs&#8217; strings is a possible impediment to <em>other</em>&hairsp;
+(<em>unrelated</em>&hairsp;) customizations;
+<em>each</em>&hairsp; and <em>every</em>&hairsp; subsequent modification
+to <em>any</em>&hairsp; of the &#8216;specs&#8217; strings,
+which are orthogonal to the changes needed to support
+the non&#8209;free runtime DLLs,
+<em>must</em>&hairsp; be <em>faithfully reproduced</em>,&hairsp;
+not only in an external <code>specs</code> file,
+but <em>also</em>&hairsp; in <em>every</em>&hairsp;
+non&#8209;free runtime specific auxiliary &#8216;specs&#8217; file;
+not only is this an undesirable maintenance burden ...
+it is potentially error&#8209;prone!
+</li></ul>
+<p>To some extent,
+these disadvantages may be mitigated by elimination of
+<em>all</em>&hairsp; unmodified &#8216;specs&#8217; strings from
+each of the auxiliary &#8216;specs&#8217; files,
+leaving the <em>entire</em>&hairsp; content of,
+for example, the <code>msvcr80</code> &#8216;specs&#8217; file,
+(incorporating the additional include file search path modification),
+as <em>exactly</em>&hairsp;:
+</p>
+<pre class="box-out">
+*cpp:
+%{posix:-D_POSIX_SOURCE} %{mthreads:-D_MT} %{pthread:-D_REENTRANT} %{!no-pthread: }
+%(local_includes) -D__MSVCRT_VERSION__=0x0800
+
+*cc1plus:
+%(local_includes) -D__MSVCRT_VERSION__=0x0800
+
+*libgcc:
+%{mthreads:-lmingwthrd} -lmingw32 -lmingwex -lmingw32 -lmingwex
+%{static|static-libgcc:-lgcc -lgcc_eh} %{!static:%{!static-libgcc:%{!shared:%{!shared-libgcc:-lgcc -lgcc_eh}
+%{shared-libgcc:-lgcc_s -lgcc}} %{shared:-lgcc_s -lgcc}}} -lmoldname80 -lmsvcr80
+
+</pre>
+<p>(and similarly, for other auxiliary &#8216;specs&#8217; files
+relating to other non&#8209;free &#8216;C&#8217; runtime DLLs).
+</p>
+<p>This is better,
+but it still leaves a significant degree of redundancy,
+in the three definitions which <em>do</em>&hairsp; need to be modified.
+A simple way to remove some of this redundancy,
+<em>without</em>&hairsp; requiring any pyhsical change to
+the originating definition,
+as it appears in the built&#8209;in &#8216;specs&#8216;,
+is by reformulating the amended <code>cpp</code>
+and <code>cc1plus</code> definitions as:
+</p>
+<pre class="box-out">
+*cpp:
++ -D__MSVCRT_VERSION__=0x0800
+
+*cc1plus:
++ -D__MSVCRT_VERSION__=0x0800
+
+</pre>
+<p>but, unfortunately,
+we cannot adopt a similar adjustment to remove the redundancy
+in the modified <code>libgcc</code> definition.
+</p>
+<p>If we do wish to eliminate the redundancies <em>entirely</em>,&hairsp;
+then we <em>must</em>&hairsp; modify the <code>libgcc</code> &#8216;specs&#8217;
+string at its point of origin;
+this implies that we <em>must</em>&hairsp; use an <em>external</em>&hairsp;
+<code>specs</code> file,
+in which we can make the necessary modification.
+Thus, if we don't already have an external &#8216;specs&#8217; file,
+we should follow the procedure described above,
+under the heading &#8220;<a href="#prep">Preparing the GCC
+&#8216;specs&#8217; for Customization</a>&#8221;,
+to create one now.
+</p>
+<p>Once we have set up an external &#8216;specs&#8217; file,
+such that <code>gcc</code>, and <code>g++</code>, will read it
+instead of using their built&#8209;in &#8216;specs&#8217;,
+we may edit it,
+splitting the original <code>libgcc</code> definition
+into a modified <code>libgcc</code>,
+and a supplementary <code>libmsvcrt</code> definition, thus:
+</p>
+<pre class=box-out>
+*libgcc:
+%{mthreads:-lmingwthrd} -lmingw32 -lmingwex -lmingw32 -lmingwex
+%{static|static-libgcc:-lgcc -lgcc_eh} %{!static:%{!static-libgcc:%{!shared:%{!shared-libgcc:-lgcc -lgcc_eh}
+%{shared-libgcc:-lgcc_s -lgcc}} %{shared:-lgcc_s -lgcc}}} %(libmsvcrt)
+
+*libmsvcrt:
+-lmoldname -lmsvcrt
+
+</pre>
+<p>(noting the use of <em>parentheses</em>&hairsp; in the
+<code>%(libmsvcrt)</code> substitution field,
+whereas <em>braces</em> are used elsewhere,
+throughout the <code>libgcc</code> definition).
+</p>
+<p>Now,
+with that single modification in place,
+within the external <code>specs</code> file,
+the supplementary <code>msvcr80</code> &#8216;specs&#8217; file
+may be condensed, to nothing more than:
+</p>
+<pre class="box-out">
+*cpp:
++ -D__MSVCRT_VERSION__=0x0800
+
+*cc1plus:
++ -D__MSVCRT_VERSION__=0x0800
+
+*libmsvcrt:
+-lmoldname80 -lmsvcr80
+
+</pre>
+<p>and Microsoft&#8217;s other non&#8209;free &#8216;C&#8217; runtime DLLs
+may be similarly supported,
+with suitably named copies of this supplementary &#8216;specs&#8217; file,
+each with appropriate changes to the <code>__MSVCRT_VERSION__</code> assignment,
+and the import libraries named in the <code>libmsvcrt</code> definition.
+</p>
+<div style="display: none">
+<!-- Seemed like a good idea, but doesn't work for C++ -->
+<h4>Consolidating Support for Non&#8209;Free Runtime Libraries</h4>
+<p>In the preceding section,
+we began with a naïve collection of supplementary &#8216;specs&#8217; files,
+each of which was a mostly redundant copy of GCC&#8217;s built&#8209;in
+&#8216;specs&#8217;, and each incorporating a minimal set of modifications,
+specific to supporting <em>one</em>&hairsp; particular version of
+Microsoft&#8217;s non&#8209;free &#8216;C&#8217; runtime DLLs.
+We observed that the redundancy in this naïvely constructed collection
+of &#8216;specs&#8217; files created an undesirable maintenance burden,
+and we further developed the concept to eliminate the redundancy.
+In the process,
+we significantly reduced the size of each &#8216;specs&#8217; file,
+while introducing a trivial dependency on a minimally&#8209;modified
+(non&#8209;redundant) external <code>specs</code> file.
+</p>
+<p>In this section,
+we will develop this concept further,
+with a view to consolidating the entire collection of separate
+&#8216;specs&#8217; files into the fewest practicable number,
+while retaining the capability to arbitrarily select any one
+of Microsoft&#8217;s non&#8209;free &#8216;C&#8217; runtime DLLs,
+with which to link any application.
+</p>
+<p>Ideally,
+we would like to consolidate all of the necessary &#8216;specs&#8217;
+string modifications into a single,
+<em>implicitly</em>&hairsp; loaded external <code>specs</code> file,
+and to use a command line option to specify the particular
+version of the &#8216;C&#8217; runtime library,
+with which the application should be linked.
+Unfortunately,
+of all the predefined option keywords which <code>gcc</code> will accept,
+only the <code>-lfoo</code> class,
+(which, strictly speaking, aren&#8217;t really options anyway),
+seem suitable for alternative runtime library selection,
+and these do not appear to participate in conditional
+&#8216;specs&#8217; string processing.
+Thus,
+we will require custom option keywords,
+which <code>gcc</code> will accept <em>only</em>&hairsp; if invoked
+with an <em>explicitly</em>&hairsp; loaded external &#8216;specs&#8217; file,
+so we will be unable to realize our ideal objective;
+the best we are likely to achieve will be <em>one</em>&hairsp; small,
+<em>explicitly</em>&hairsp; loaded external &#8216;specs&#8217; file,
+to enable the use of custom options,
+(and to handle at least some of their interpretation),
+in conjunction with an implicitly loaded external <code>specs</code> file,
+modified as in the preceding section, to avoid redundancy.
+</p>
+<p>As it happens,
+the latter best practicable objective is entirely achievable.
+If we keep the external <code>specs</code> file <em>exactly</em>&hairsp;
+in the state as we developed it in the preceding section, but,
+instead of the collection of supplementary &#8216;specs&#8217; files,
+(one for each non&#8209;free runtime DLL),
+we create just <em>one</em>,&hairsp;
+(let&#8217;s call it <code>opt</code>),
+with content:
+</p>
+<pre class="box-out">
+*cpp:
++ %{msvcr*:-D__MSVCRT_VERSION__=0x0%*0}%&lt;msvcr*
+
+*cc1plus:
++ %{msvcr*:-D__MSVCRT_VERSION__=0x0%*0}%&lt;msvcr*
+
+*libmsvcrt:
+-lmoldname%{msvcr*:%* -lmsvcr%*}%{!msvcr*: -lmsvcrt}
+
+</pre>
+<p>then we may link our applications with <em>any</em>&hairsp;
+of Microsoft&#8217;s non&#8209;free &#8216;C&#8217; runtime DLLs,
+simply by invoking <code>gcc</code>, (or <code>g++</code>), like this:
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -specs=opt -msvcr&lt;N&gt; foo.c -o foo.exe</kbd>
+</pre>
+<p>(where &#8220;<code>&lt;N&gt;</code> represents the numeric identifier,
+within the runtime DLL name);
+thus, for example:
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -specs=opt -msvcr80 foo.c -o foo.exe</kbd>
+</pre>
+<p>would result in <code>foo.exe</code> being
+linked with <code>MSVCR80.DLL</code>, while:
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -specs=opt -msvcr120 foo.c -o foo.exe</kbd>
+</pre>
+<p>would result in linking with <code>MSVCR120.DLL</code>,
+and the system will automatically adapt,
+to accommodate linking with any other numerically identified runtime DLL,
+which may be available, (or may become available in the future),
+<em>without</em>&hairsp; requiring a separate &#8216;specs&#8217; file
+for each distinct DLL.
+</p>
+</div><!-- undisplayed -->
+</div><!-- msvcrt -->
+
+<!-- $RCSfile$: end of file -->
