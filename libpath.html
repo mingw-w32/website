@@ -1,0 +1,729 @@
+<!DOCTYPE HTML><!--
+ *
+ * libpath.html
+ *
+ * HOWTO establish the search path for libraries, which are to be made
+ * available for use with the MinGW GCC compiler suite.
+ *
+ *
+ * $Id$
+ *
+ * Written by Keith Marshall <keith@users.osdn.me>
+ * Copyright (C) 2021, MinGW.OSDN Project
+ *
+ *
+ * Redistribution and use in source and 'compiled' forms (SGML, HTML,
+ * PDF, PostScript, RTF, etc) with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer as
+ *    the first lines of this file, unmodified.
+ *
+ * 2. Redistributions in compiled form (transformed to other DTDs,
+ *    converted to PDF, PostScript, RTF and other formats) must
+ *    reproduce the above copyright notice, this list of conditions
+ *    and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS DOCUMENTATION IS PROVIDED BY THE MINGW.OSDN PROJECT "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE MINGW.OSDN PROJECT, OR
+ * ITS CONTRIBUTORS, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ *
+ *
+ * Note: this page assumes browser support for the following numeric
+ * HTML entity codes:
+ *
+ *    &#8197;   fixed width 1/4 em space
+ *    &#8209;   non-breaking hyphen
+ *    &#8216;   typographic left (opening) single quote
+ *    &#8217;   typographic apostrophe/right (closing) single quote
+ *    &#8220;   typographic left (opening) double quote
+ *    &#8221;   typographic right (closing) double quote
+ *
+-->
+<script class="masthead">
+/* Script fragment, to assign titles specific to this page; this is
+ * encapsulated within the "masthead", where such titles are displayed,
+ * to ensure that whatever page content may follow will be correctly
+ * positioned, relative to the masthead content.
+ */
+ set_page("title", "MinGW Compiler Suite User Guide");
+ set_page("subtitle",
+     "HOWTO Specify the MinGW Linker&#8217;s Search Path for Object Code Libraries"
+   );
+</script><!-- masthead -->
+<div class="masthead" style="display: none">
+<p class="byline">Posted: 23-March-2009, by Keith; Last Update: 22-Nov-2021</p>
+<p>FIXME: Page under construction; some value here now, but not yet complete.
+</p>
+<p>I will add to this as time permits; please bear with me.
+My intent is to offer advice, complementing the information relating to
+<a href="index.html?page=isystem.html">include file search paths</a>,
+on circumventing the limitations of MinGW&#8217;s GCC when installing,
+and subsequently linking with, user added function libraries.
+</p>
+<hr />
+</div><!-- masthead -->
+<div class="overlapped" id="intro">
+<h3>Introduction</h3>
+<p>This Mini&#8209;HOWTO further develops the theme introduced by the
+&#8220;<a href="index.html?page=isystem.html"
+>Include&#8197;File&#8197;Search&#8197;Path&#8197;HOWTO</a>&#8221;,
+progressing to a complementary consideration of where the MinGW implementation
+of GCC, (or more accurately, of the linker, <code>ld</code>, which is actually
+a component of the GNU <code>binutils</code> package), searches for object
+code libraries.
+In particular, it address the question: &#8220;<em>How do I ensure that the
+MinGW linker will find my object libraries?</em>&thinsp;&#8221;
+</p>
+<p>In the case of <em>header files</em>,
+we observed that the <a rel="noopener noreferrer" target="_blank"
+ href="https://gcc.gnu.org/onlinedocs/index.html#dir">GCC Manual</a>
+makes a <a rel="noopener noreferrer" target="_blank"
+ href="https://gcc.gnu.org/onlinedocs/gcc-3.4.5/cpp/Search-Path.html#Search-Path"
+>definitive statement</a>, regarding the search path for header files,
+(<em>although it became significantly less definitive,
+<a rel="noopener noreferrer" target="_blank"
+ href="https://gcc.gnu.org/onlinedocs/cpp/Search-Path.html#Search-Path"
+>in the documentation for GCC&#8209;7 and later</a></em>&thinsp;),
+yet we also noted that this statement is not applicable to the MinGW
+implementation of GCC.  In the case of <em>libraries</em>,
+the <a "noopener noreferrer" target="_blank"
+ href="https://gcc.gnu.org/onlinedocs/index.html#dir">GCC Manual</a>
+makes a much <a "noopener noreferrer" target="_blank"
+ href="https://gcc.gnu.org/onlinedocs/gcc-3.4.5/gcc/Link-Options.html#Link-Options"
+>less definitive statement</a>,
+which is paradoxically more applicable to the MinGW implementation,
+regarding the default search path:
+</p>
+<div class="box-out">
+<code>-llibrary</code><br />
+<code>-l</code>&nbsp;<code>library</code>
+<p>Search the library named <code>library</code> when linking.
+(The second alternative
+with the <code>library</code> as a separate argument is only for POSIX compliance and
+is not recommended.)
+</p>
+<p>It makes a difference where in the command you write this option; the
+linker searches and processes libraries and object files in the order they
+are specified.
+Thus,
+&#8216;<code>foo.o&nbsp;-lz&nbsp;bar.o</code>&#8217;
+searches library &#8216;<code>z</code>&#8217; after file <code>foo.o</code>
+but before <code>bar.o</code>.
+If <code>bar.o</code> refers to functions in &#8216;<code>z</code>&#8217;,
+those functions may
+not be loaded.
+</p>
+<p>The linker searches a standard list of directories for the library, which is
+actually a file named <code>liblibrary.a</code>.  The linker then uses this file as if it
+had been specified precisely by name.
+</p>
+<p>The directories searched include several standard system directories plus
+any that you specify with <code>-L</code>.
+</p>
+</div>
+<p><em>Note:</em>
+the second paragraph of the above extract is not strictly relevant to
+the subject of this Mini&#8209;HOWTO; I&#8217;ve chosen not to elide it,
+because it answers another FAQ: &#8220;<em>Why do I get undefined reference
+errors, when the symbols in question are definitely present in the libraries
+I&#8217;ve specified with <code>-l</code> options?</em>&thinsp;&#8221; &mdash;
+the usual answer is that the <code>-l</code> options have been placed
+too early in the command line argument sequence.
+The remainder, and in particular the final paragraph, are pertinent,
+vaguely indicating that libraries will be searched for in
+<em>several standard system directories</em>;
+these will be identified more explicitly in this Mini&#8209;HOWTO.
+</p>
+</div><!-- intro -->
+
+<div class="overlapped" id="altref">
+<h3>Consulting an Alternative Reference Source<br />
+The GNU Binary File Utilities Manual&#8217;s Perspective</h3>
+<p>We have observed that the
+<a rel="noopener noreferrer" target="_blank"
+ href="https://gcc.gnu.org/onlinedocs/index.html#dir">GCC Manual</a>
+makes no definitive statement, regarding the default directories
+to be searched for libraries.
+Since the actual library search is performed by the linker,
+<code>ld</code>, which is a component of the <em>GNU Binary File Utilities</em>,
+(more commonly known as <em>binutils</em>), we might hope to find a
+more definitive statement in the
+<a rel="noopener noreferrer" target="_blank"
+ href="https://sourceware.org/binutils/docs/ld/index.html"
+>applicable section</a> of the 
+<a rel="noopener noreferrer" target="_blank"
+ href="https://sourceware.org/binutils/docs/index.html"
+>Binutils Manual</a>.
+Unfortunately, while obviously a useful reference for
+the <em>GNU Binary File Utilities</em> in general,
+<a rel="noopener noreferrer" target="_blank"
+ href="https://sourceware.org/binutils/docs/ld/index.html"
+>this manual</a> appears to be equally noncommittal;
+the only references to be found, to library search paths,
+are in the
+<a rel="noopener noreferrer" target="_blank"
+ href="https://sourceware.org/binutils/docs/ld/Options.html#index-search-directory_002c-from-cmd-line-55"
+>Command Line Options</a> section:
+</p>
+<div class="box-out">
+<code>-Lsearchdir
+<br />--library-path=searchdir
+</code>
+<p>Add path <code>searchdir</code> to the list of paths
+that <code>ld</code> will search for archive
+libraries and <code>ld</code> control scripts.
+You may use this option any number of times.
+The directories are searched in the order in which they are specified
+on the command line.
+Directories specified on the command line are searched
+before the default directories.
+All <code>-L</code> options apply to all <code>-l</code> options,
+regardless of the order in which the options appear.
+</p>
+<p>If <code>searchdir</code> begins with <code>=</code>,
+then the <code>=</code> will be replaced by the <code>sysroot</code> prefix,
+a path specified when the linker is configured.
+</p>
+<p>The default set of paths searched (without being specified with
+&#8216;<code>-L</code>&#8217;) depends
+on which emulation mode <code>ld</code> is using,
+and in some cases also on how it was configured.
+See <a rel="noopener noreferrer" target="_blank"
+ href="https://sourceware.org/binutils/docs/ld/Environment.html#Environment"
+>Environment</a>.
+</p>
+<p>The paths can also be specified in a link script with
+the <code>SEARCH_DIR</code> command.
+Directories specified this way are searched at the point in which the linker
+script appears in the command line.
+</p></div>
+<p>and in the <a rel="noopener noreferrer" target="_blank"
+ href="https://sourceware.org/binutils/docs/ld/File-Commands.html#index-search-path-in-linker-script-334"
+>Linker Scripts / File Commands</a> section:
+</p>
+<div class="box-out">
+<code>SEARCH_DIR(path)</code>
+<p>The <code>SEARCH_DIR</code> command adds path to the list of paths
+where <code>ld</code> looks for archive libraries.
+Using <code>SEARCH_DIR(path)</code> is exactly like using
+&#8216;<code>-L</code>&nbsp;<code>path</code>&#8217;
+on the command line (see <a rel="noopener noreferrer" target="_blank"
+ href="https://sourceware.org/binutils/docs/ld/Options.html#index-search-directory_002c-from-cmd-line-55"
+>Command Line Options)</a>.
+If both are used, then the linker will search both paths.
+Paths specified using the command line option
+are searched first.
+</p></div>
+<p>while the <a rel="noopener noreferrer" target="_blank"
+ href="https://sourceware.org/binutils/docs/ld/Environment.html#Environment"
+>Environment</a> reference, appearing within the <a rel="noopener noreferrer" target="_blank"
+ href="https://sourceware.org/binutils/docs/ld/Options.html#index-search-directory_002c-from-cmd-line-55"
+>Command Line Options</a> reference, apparently has nothing to say,
+which is related to this subject.
+</p>
+</div><!-- altref -->
+
+<div class="overlapped" id="default-path">
+<h3>Determining MinGW&#8217;s Default Library Search Path</h3>
+<p>So, if the applicable manuals don&#8217;t give us any definitive
+indication of which directories will be searched for libraries, how
+<em>can</em> we identify where the MinGW tools will search?
+</p>
+<p>The <a rel="noopener noreferrer" target="_blank"
+ href="https://sourceware.org/binutils/docs/ld/index.html"
+><em>ld manual</em></a> tells us that the <a rel="noopener noreferrer" target="_blank"
+ href="https://sourceware.org/binutils/docs/ld/Options.html#index-search-directory_002c-from-cmd-line-55"
+>directories searched</a> will be those specified on the command line,
+using <code>-L</code> options,
+followed by those specified in the effective <em>linker script</em>,
+using the <code>SEARCH_DIR</code> script command.
+We may identify the search directories specified within
+the default <em>linker script</em>,
+by running the command:
+</p>
+<pre class="vt box-out">
+$ <kbd>ld --verbose | grep SEARCH_DIR | tr -s ' ;' \\012</kbd>
+</pre>
+<p>which, with a standard MinGW installation,
+might produce output similar to:
+</p>
+<pre class="vt box-out">
+$ <kbd>ld --verbose | grep SEARCH_DIR | tr -s ' ;' \\012</kbd>
+SEARCH_DIR(&quot;/mingw/mingw32/lib&quot;)
+SEARCH_DIR(&quot;/mingw/lib&quot;)
+SEARCH_DIR(&quot;/usr/local/lib&quot;)
+SEARCH_DIR(&quot;/lib&quot;)
+SEARCH_DIR(&quot;/usr/lib&quot;)
+</pre>
+<p>The first thing we might notice about these
+is that they are all specified in the style of POSIX paths;
+however, since the MinGW tools are all native MS&#8209;Windows applications,
+the linker will be unable to resolve these paths,
+in any manner other than as absolute with respect to
+the <em>current drive</em>,
+at the time when the linker is invoked.
+Thus, even if these directories do exist,
+(which is unlikely in a standard MS&#8209;Windows installation),
+they may represent <em>different</em> locations,
+depending on whichever drive the user has made <em>current</em>,
+at the time when the linker is invoked.
+(For users of MSYS,
+they will <em><strong>definitely not</strong></em> be resolved
+relative to the root of the MSYS virtual file system,
+even if that is what the user might like).
+</p>
+<p>Now, we have seen that none of its pre&#8209;configured search paths
+seem to be particularly useful as default search paths,
+for use with the MinGW linker.
+That may be considered to be a configuration error,
+(which a future <em>binutils</em> package release may address);
+nevertheless, it does not appear to present a significant obstacle
+to operation in practice,
+since suitable search paths may <em>always</em> be specified
+using <code>-L</code> options.  Of course,
+any such options which <em><strong>we</strong></em> are required
+to specify on the command line,
+can hardly be described as <em><strong>default</strong></em> search paths;
+however,
+if we adopt the recommended practice of <em><strong>always</strong></em>
+invoking <code>ld</code> via an appropriate GCC front&#8209;end,
+then the GCC driver has an opportunity to supply such options,
+in a manner which may be so described, and in fact,
+this is precisely what happens.
+</p>
+<p>Thus, we have established that the linker&#8217;s
+default search paths have little value, in a standard MinGW installation,
+but that GCC itself furnishes the effective defaults,
+by supplying appropriate <code>-L</code> options.
+To discover what these default <code>-L</code> options are,
+we might use the command:
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -print-search-dirs</kbd>
+</pre>
+<p>If we run this,
+we will see a sprawling mess of nigh incomprehensible output;
+some judicious filtering, to extract only the library search paths,
+normalize them to canonical forms, and present them one per line,
+can reduce it to a form which is more readily interpreted,
+(as in this example, with an old MinGW GCC&#8209;3.4.5 system,
+running under MSYS):
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -print-search-dirs | \</kbd>
+&gt; <kbd>sed '/^lib/b 1;d;:1;s,/[^/.][^/]*/\.\./,/,;t 1;s,:[^=]*=,:;,;s,;,;  ,g' | \</kbd>
+&gt; <kbd>tr \; \\012</kbd>
+libraries:
+c:/mingw/lib/gcc/mingw32/3.4.5/
+c:/mingw/lib/gcc/
+/mingw/lib/gcc/mingw32/3.4.5/
+/usr/lib/gcc/mingw32/3.4.5/
+c:/mingw/mingw32/lib/mingw32/3.4.5/
+c:/mingw/mingw32/lib/
+/mingw/mingw32/lib/mingw32/3.4.5/
+/mingw/mingw32/lib/
+/mingw/lib/mingw32/3.4.5/
+/mingw/lib/
+c:/mingw/lib/mingw32/3.4.5/
+c:/mingw/lib/
+/mingw/lib/mingw32/3.4.5/
+/mingw/lib/
+/lib/mingw32/3.4.5/
+/lib/
+/usr/lib/mingw32/3.4.5/
+/usr/lib/
+</pre>
+<p>Once again,
+we may observe that this list includes a number of POSIX style paths,
+which most likely are not relevant for a MinGW installation.
+If we further filter, to remove the POSIX paths,
+and keep only the MS&#8209;Windows style paths,
+this list reduces to:
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -print-search-dirs | \</kbd>
+&gt; <kbd>sed '/^lib/b 1;d;:1;s,/[^/.][^/]*/\.\./,/,;t 1;s,:[^=]*=,:;,;s,;,;  ,g' | \</kbd>
+&gt; <kbd>tr \; \\012 | \</kbd>
+&gt; <kbd>grep -v '^ */'</kbd>
+libraries:
+c:/mingw/lib/gcc/mingw32/3.4.5/
+c:/mingw/lib/gcc/
+c:/mingw/mingw32/lib/mingw32/3.4.5/
+c:/mingw/mingw32/lib/
+c:/mingw/lib/mingw32/3.4.5/
+c:/mingw/lib/
+</pre>
+<p>From this,
+we might deduce that GCC will pass each of these paths to the linker,
+using an appropriate <code>-L</code> option; to verify that deduction,
+we might use GCC&#8217;s <code>-###</code> option,
+in a command such as:
+</p>
+<pre class="vt box-out">
+gcc -### -o foo foo.c
+</pre>
+<p>to reveal <em>exactly</em> what command GCC will pass to the linker; (again, the output is not formatted for easy reading, but some judicious filtering will extract just the <code>-L</code> options, and present them in a form which can be more easily read by humans):
+</p>
+<pre class="vt box-out">
+$ <kbd>touch foo.c</kbd>
+$ <kbd>gcc -### -o foo foo.c 2&gt;&amp;1 | \</kbd>
+&gt; <kbd>tr -s \\040 \\012 | \</kbd>
+&gt; <kbd>sed '/^&quot;-L/!d;s,,,;s,&quot;$,/,;:1;s,/[^/.][^/]*/\.\./,/,;t 1' | \</kbd>
+&gt; <kbd>sed 's,^,  ,;1h;1s,.*,libraries:,;1G'</kbd>
+libraries:
+c:/mingw/lib/gcc/mingw32/3.4.5/
+c:/mingw/lib/gcc/
+c:/mingw/mingw32/lib/
+c:/mingw/lib/
+</pre>
+<p>Oops!  What happened there?  In these examples,
+GCC&#8217;s <code>&#8209;print&#8209;search&#8209;dirs</code>
+option tells us that there are <em>six</em> MS&#8209;Windows paths
+it will search, but <em>only four</em> of those are passed on
+to the linker, as <code>-L</code> options.
+Why are all six not passed on?
+</p>
+<p>Well,
+recall that we arbitrarily chose to ignore
+the POSIX style paths in GCC&#8217;s built&#8209;in list,
+when we formulated the list of MS&#8209;Windows paths we expected
+to be searched, but why would GCC itself make such an arbitrary choice?
+In reality, it doesn&#8217;t.
+Let&#8217;s re&#8209;examine that full list of built&#8209;in paths,
+but this time we will filter it on an analytical basis,
+selecting only those paths which represent
+actual <em>physical</em> directories
+on our host machine:
+</p>
+<pre class="vt box-out">
+$ <kbd>( echo libraries:</kbd>
+&gt;   <kbd>drive=`pwd -W | sed 's,:.*,,'`</kbd>
+&gt;   <kbd>for dir in `gcc -print-search-dirs \</kbd>
+&gt;     <kbd>| sed '/^lib/b 1;d;:1;s,/[^/.][^/]*/\.\./,/,;t 1;s,:[^=]*=,:;,' \</kbd>
+&gt;     <kbd>| tr \; '\012' \</kbd>
+&gt;     <kbd>| sed &quot;s,^/,$drive:/,&quot;`</kbd>
+&gt;     <kbd>do test -d $dir &amp;&amp; echo &quot;  $dir&quot;</kbd>
+&gt;     <kbd>done</kbd>
+&gt; <kbd>)</kbd>
+libraries:
+c:/mingw/lib/gcc/mingw32/3.4.5/
+c:/mingw/lib/gcc/
+c:/mingw/mingw32/lib/
+c:/mingw/lib/
+</pre>
+<p>which, we observe,
+now exactly matches the list of <code>-L</code> options
+we see passed to the linker,
+when we invoke GCC with the <code>-###</code> option.
+Thus, we may refine our previous deduction,
+to conclude that GCC will examine its built&#8209;in
+list of pre&#8209;configured library search directories,
+passing on to the linker, in the form of <code>-L</code> options,
+those which represent actual physical directories on the host machine;
+therefore, this becomes the list of default library search
+directories for MinGW.
+</p>
+</div><!-- default-path -->
+
+<div class="overlapped" id="install">
+<h3>Installation and Use of Supplementary Libraries with MinGW</h3>
+<p>When a project uses only the standard core libraries,
+either as provided by the MS&#8209;Windows operating system itself,
+or those provided as integral components of the MinGW distribution,
+the user need take no action to ensure that those libraries
+will be searched at link time;
+the compiler driver will take care of it automatically.
+Even in cases where the project relies on <em>optional</em> libraries
+supplied as standard operating system components,
+and for which MinGW provides <em>import libraries</em>,
+the user need do no more than specify an appropriate
+<code>-l<em>NAME</em></code> option to the compiler driver,
+and the library will be linked, as required.
+In either of these cases,
+the necessary libraries are located within the default search path,
+and no particular action is required of the user,
+to specify where that might be.
+</p>
+<p>Conversely,
+when a project supplements the standard libraries,
+with one or more which it creates exclusively for its own use,
+then those libraries will <em>not</em> be found
+in the default search path,
+so their location must be explicitly identified to the compiler driver,
+to ensure that they can be found at link time.
+In such cases,
+in which the libraries are not installed for use by other projects,
+the most common, and indeed the expected practice,
+is for the project maintainer to specify the library locations explicitly,
+by addition of appropriate <code>-L</code> options to the linking commands
+within the project&#8217;s build system infrastructure.
+When this is done correctly,
+there is again no action required of the user,
+to specify the location of such supplementary libraries.
+</p>
+<p>The situation becomes much more interesting,
+when a project provides one or more supplementary libraries
+for use by <em>other</em> projects.
+In such cases,
+there is an expectation that the libraries will be <em>installed</em>
+in some central location,
+whence they will become readily accessible
+when <em>client</em> projects are linked,
+<em>without</em> a need for any particular intervention by
+the user building the client project,
+to specify that location.
+</p>
+<p>On typical POSIX systems,
+and in particular on those conforming to the GNU model,
+it is common for the standard system libraries,
+including those provided as standard components of the compiler suite,
+to be installed in /<em>lib</em> or /<em>usr</em>/<em>lib</em>,
+while supplementary libraries may be installed in
+/<em>usr</em>/<em>local</em>/<em>lib</em>.
+In fact, as we have already observed,
+these three locations are already included,
+by means of <code>SEARCH_DIR(&quot;...&quot;)</code> commands
+in the default linker scripts,
+as defaults to be searched by the MinGW linker;
+unfortunately, they are specified exactly as such,
+in the original POSIX format,
+which cannot be readily interpreted in the file system context
+in which the MinGW linker must operate!
+This is a limitation of the MinGW linker,
+which the user installing supplementary libraries must work around,
+possibly by adopting one of the following strategies:&ndash;
+</p>
+<ol style="margin-left: -0.3em; list-style: lower-alpha">
+<li>Install in a <em>non&#8209;default</em> location,
+and require every user of the installed libraries to explicitly
+add the requisite <code>-L</code> options to the linking commands,
+for <em>every</em> subsequent project which requires any supplementary library.
+This is inconvenient for subsequent use,
+and is generally not recommended.
+</li>
+<li>Install in a location
+which is already considered to be a default by the compiler driver.
+This often recommended option is the simplest possible,
+for <em>both</em> the user installing the libraries,
+<em>and</em> for those using them.
+If using MSYS as the command line environment
+for building and installing the libraries,
+and the libraries themselves are delivered as GNU standard source packages,
+such installation may be readily accomplished by the command sequence:
+<pre class="vt box-out">
+$ <kbd>../path/to/configure --prefix=`cd /mingw ; pwd -W` ... &amp;&amp; make &amp;&amp; make install</kbd>
+</pre>
+<p>(Note:
+here we explicitly force the use of MS&#8209;Windows <em>native</em>
+path format for the <em>prefix</em>; this is normally necessary,
+if the libraries being built hard code
+the <em>prefix</em> within object files).
+</p>
+<p>It may be noted that,
+in this example, we appear to have arbitrarily chosen the
+top level <em>lib</em> sub&#8209;directory,
+within MinGW&#8217;s own installation directory,
+as the preferred location for installation of supplementary libraries;
+in reality, of the pre&#8209;existing default search directories,
+this is the only sane choice,
+since the others are much more specifically associated with
+the component libraries provided by the compiler suite itself,
+and it is undesirable to pollute them with &#8220;foreign&#8221; libraries.
+Indeed, many users also consider it undesirable to pollute the top level
+MinGW library directory with such &#8220;foreign&#8221; libraries;
+such users may prefer the following alternative installation strategy.
+</p></li>
+<li>Install in a <em>non&#8209;default</em> location,
+just as in the first option, but also customize the <em>linker scripts</em>,
+or the <em>compiler driver specs</em>,
+to <em>implicitly</em> add the requisite <code>-L</code> option,
+such that this location becomes an additional default search path.
+Available techniques for achieving such customization will be discussed,
+in the following section.
+</li>
+</ol>
+</div><!-- install -->
+
+<div class="overlapped" id="customize">
+<h3>Customizing MinGW&#8217;s Default Library Search Path</h3>
+<p>So, you&#8217;ve decided you would prefer to segregate
+your add&#8209;on libraries from the core MinGW libraries?
+The first issue to address,
+is <em>where</em> you would like to install them.
+</p>
+<p>Here, you have two basic options:
+<ol style="margin-left: -0.3em; list-style: lower-alpha">
+<li>Establish a set up,
+analogous to the common /<em>usr</em>/<em>local</em> hierarchy
+of typical Unix systems, with all additional libraries,
+and their associated header files, collected into this one location.
+</li>
+<li>Provide a separate directory for each individual library package,
+and customize the GCC search paths to consider <em>all</em> of them,
+as appropriate, when looking for libraries and header files.
+</li>
+</ol>
+</p>
+<p>It should be fairly obvious that
+the first of these will require less GCC customization than the second.
+In fact, the principles are the same in both cases;
+however, whereas the first requires the addition of only one include path,
+(<code>-I</code> option), and one library path, (<code>-L</code> option),
+the second will require one of each per library package installed,
+which may be detrimental to GCC performance.
+Thus, we will describe only the first option in detail;
+users preferring the second may extend the principles described,
+as necessary, to accommodate their preference.
+</p>
+<p>Having chosen to install all add&#8209;on libraries in a common location,
+the choice of that location is fairly arbitrary.
+MSYS users may choose to simply use the conceptual /<em>usr</em>/<em>local</em>
+of their existing MSYS installation, in which case,
+they must ensure that that directory physically exists,
+(it may not in a bare, standard MSYS installation),
+and they must identify its true <em><strong>native</strong></em> Windows path,
+for use in the GCC customization, as shown in the following example,
+for a <em><strong>standard</strong></em> MSYS installation in its
+<em><strong>default</strong></em> installation directory:
+</p>
+<pre class="vt box-out">
+$ <kbd>mkdir -p /usr/local</kbd>
+$ <kbd>( cd /usr/local &amp;&amp; pwd -W )</kbd>
+c:/msys/1.0/local
+</pre>
+<p><em><strong>Caution:</strong>
+Although this choice of directory may seem attractive,
+particularly because it matches the default prefix assumed by
+the majority of GNU packages,
+it may <strong>not</strong> represent the <strong>best</strong> choice
+for all MSYS users.
+This is particularly true for those users
+who may wish to develop MSYS applications.
+The special MSYS build of <strong>GCC</strong>
+used to compile such applications reserves </em>/usr/local<em>
+for its own purposes;
+in this case,
+it <strong>must not</strong> be polluted by headers and libraries
+intended for use with the MinGW build of <strong>GCC</strong>.</em>
+</p>
+<p>Alternatively,
+masochists who prefer to persist with <code>cmd.exe</code>,
+or MSYS users who prefer to keep MinGW related add&#8209;ons more
+closely associated with their MinGW installations,
+might choose to create an installation directory
+locally within their MinGW tree:
+</p>
+<pre class="vt box-out">
+C:\&gt; <kbd>mkdir c:\mingw\local</kbd>
+</pre>
+<p>or adjacent to it:
+</p>
+<pre class="vt box-out">
+C:\&gt; <kbd>mkdir c:\mingw-local</kbd>
+</pre>
+<p><em><strong>Caution:</strong>
+Whichever of these options you choose,
+<strong>please do not</strong> choose to create <strong>any directory
+with white space</strong> appearing <strong>anywhere</strong> in
+its absolute path name.
+If you adopt this asinine practice,
+do not be surprised if it turns around and bites.
+When it does, please <strong>do not</strong> come here to complain;
+you have been warned!</em>
+</p>
+<p>Once the tree into which supplementary libraries,
+and their headers, are to be installed has been selected,
+and created, the next step is to install the requisite
+library packages into this tree.
+In the case of standard GNU library packages,
+and assuming you have chosen <em>C:\MinGW\local</em> as your
+supplementary installation path,
+(MSYS users may refer to it simply as <em>/mingw/local</em>),
+this may be accomplished from the MSYS shell, by running:
+</p>
+<pre class="vt box-out">
+$ <kbd>../path/to/configure --prefix=/mingw/local ... &amp;&amp; make &amp;&amp; make install</kbd>
+</pre>
+<p>(or, if you suspect that the library may hard code
+its installation path within itself):
+</p>
+<pre class="vt box-out">
+$ <kbd>../path/to/configure --prefix=`cd /mingw/local ; pwd -W` ... &amp;&amp; make &amp;&amp; make install</kbd>
+</pre>
+<p><em><strong>Note:</strong>
+If the library package is <strong>not</strong> a standard GNU package,
+you will need to adapt its installation procedure to achieve the effect
+of the above.
+Details of how this may be achieved are package specific,
+and are beyond the scope of this HOWTO.</em>
+</p>
+<p>Finally,
+having installed supplementary libraries and their headers
+into the supplementary directory tree,
+they must be made available to the GCC compilers.
+Of course,
+this may <em><strong>always</strong></em> be achieved by adding
+appropriate <code>-I</code>&nbsp;<code>...</code>,
+and <code>-L</code>&nbsp;<code>...</code> specifications to the commands,
+when the compilers are invoked,
+but that hardly seems consistent with the level of convenience
+we are striving to achieve!
+Obviously, the desired objective can best be met if it can be arranged
+for the compilers to search in the supplementary tree by default;
+this may be achieved by adding the path name for the supplementary
+include file tree to the compilers&#8217; default search paths,
+as described in the
+&#8220;<a href="index.html?page=isystem.html">Include Path HOWTO</a>&#8221;,
+accompanied by <em>either</em> of:
+</p>
+<ol style="margin-left: -0.3em; list-style: lower-alpha">
+<li>Adding the path name for the supplementary library directory to
+the <em>semicolon</em> separated list of library search directories specified
+by the <code>LIBRARY_PATH</code> environment variable,
+(which <em><strong>must</strong></em> be <em><strong>exported</strong></em>,
+if it is assigned from within the MSYS shell):
+<pre class="vt box-out">
+$ <kbd>export LIBRARY_PATH</kbd>
+$ <kbd>LIBRARY_PATH="C:/mingw/local/lib;$LIBRARY_PATH"</kbd>
+</pre>
+<p><em><strong>Note:</strong>
+The GCC manual states that this technique may be used
+<strong>only</strong>
+when GCC is configured as a <strong>native</strong> compiler;
+thus, this method of specifying the supplementary library path
+may not be used when your MinGW GCC is configured as a cross&#8209;compiler.
+Indeed, it would be illogical to use this technique with a cross&#8209;compiler,
+as it would lead to confusion between those libraries which are specific
+to the native GCC compiler on the build platform,
+and those which are specific to the cross&#8209;compiler.</em>
+</p>
+</li>
+<li>Follow the method,
+as described in the
+&#8220;<a href="index.html?page=gccspecs.html">GCC Customization HOWTO</a>&#8221;,
+to add a supplementary path to the default library search path.
+<p><em><strong>Note:</strong>
+This method is applicable <strong>equally</strong> to MinGW GCC
+configured as a native compiler <strong>or</strong> configured as
+a cross&#8209;compiler;
+the additional search path applies <strong>only</strong> to
+the specific instance of the compiler
+with which the modified specs file is associated</em>.
+</p></li>
+</ol>
+<!--p><em>TODO: additional text for this section to be added</em>.</p-->
+</div><!-- customize -->
+
+<!-- $RCSfile$: end of file -->
