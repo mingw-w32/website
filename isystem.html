@@ -1,0 +1,542 @@
+<!DOCTYPE HTML><!--
+ *
+ * isystem.html
+ *
+ * HOWTO establish the search path for system header files, which are
+ * to be included when compiling code using the MinGW GCC compilers.
+ *
+ *
+ * $Id$
+ *
+ * Written by Keith Marshall <keith@users.osdn.me>
+ * Copyright (C) 2008, 2021, MinGW.OSDN Project
+ *
+ *
+ * Redistribution and use in source and 'compiled' forms (SGML, HTML,
+ * PDF, PostScript, RTF, etc) with or without modification, are permitted
+ * provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer as
+ *    the first lines of this file, unmodified.
+ *
+ * 2. Redistributions in compiled form (transformed to other DTDs,
+ *    converted to PDF, PostScript, RTF and other formats) must
+ *    reproduce the above copyright notice, this list of conditions
+ *    and the following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * THIS DOCUMENTATION IS PROVIDED BY THE MINGW.OSDN PROJECT "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE MINGW.OSDN PROJECT, OR
+ * ITS CONTRIBUTORS, BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS DOCUMENTATION, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ *
+ *
+ * Note: this page assumes browser support for the following numeric
+ * HTML entity codes:
+ *
+ *    &#8209;   non-breaking hyphen
+ *    &#8216;   typographic left (opening) single quote
+ *    &#8217;   typographic apostrophe/right (closing) single quote
+ *    &#8220;   typographic left (opening) double quote
+ *    &#8221;   typographic right (closing) double quote
+ *
+-->
+<script class="masthead">
+/* Script fragment, to assign titles specific to this page; this is
+ * encapsulated within the "masthead", where such titles are displayed,
+ * to ensure that whatever page content may follow will be correctly
+ * positioned, relative to the masthead content.
+ */
+ set_page("title", "MinGW Compiler Suite User Guide");
+ set_page("subtitle",
+     "HOWTO Specify the Include File Search Path for use with MinGW Compilers"
+   );
+</script><!-- masthead -->
+<div class="masthead" style="display: none">
+<p class="byline">Posted: 21-Nov-2008, by Keith; Last Update: 22-Nov-2021</p>
+</div><!-- masthead -->
+<div class="overlapped" id="introduction">
+<h3>Introduction</h3>
+<p>This Mini&#8209;HOWTO answers the question:
+<em>&#8220;Why can&#8217;t the MinGW compilers find
+my project&#8217;s header files?&#8221;</em>
+</p>
+<p>Prior to the publication of the <em>GCC&#8209;7</em> documentation,
+(when the wording changed, to provide only a brief outline of
+<a href="#default-search">the identification method described below</a>),
+the <a rel="noopener noreferrer" target="_blank"
+ href="https://gcc.gnu.org/onlinedocs/gcc-3.4.5/cpp/index.html#Top">CPP Section</a>
+of the <a rel="noopener noreferrer" target="_blank"
+ href="https://gcc.gnu.org/onlinedocs/index.html#dir">GCC Manual</a>
+indicated that header files may be located in
+<a rel="noopener noreferrer" target="_blank"
+ href="https://gcc.gnu.org/onlinedocs/gcc-3.4.5/cpp/Search-Path.html#Search-Path"
+>the following directories</a>:&ndash;
+</p>
+<div class="box-out">
+<p>On a normal Unix system, if you do not instruct it otherwise,
+[GCC] will look for headers requested with
+<code>#include</code>&nbsp;<code>&lt;file&gt;</code> in:
+</p><pre>
+     /usr/local/include
+     libdir/gcc/target/version/include
+     /usr/target/include
+     /usr/include
+</pre>
+<p>For <code>C++</code> programs,
+it will also look in <code>/usr/include/g++-v3</code>, first.
+</p></div>
+<p>Of course, the
+<a rel="noopener noreferrer" target="_blank"
+ href="https://osdn.net/projects/mingw/releases/p15691"
+>MinGW ports of GCC</a>
+target Microsoft&#8217;s Windows system,
+which is <em><strong>not</strong></em>
+a <em>&#8220;normal UNIX system&#8221;</em>.
+Nevertheless, many users,
+particularly those coming from a UNIX or GNU/Linux background,
+and especially when they use MSYS to emulate a UNIX file system model
+on their MS&#8209;Windows hosts,
+are surprised to find that MinGW,
+using its default configuration,
+does <em><strong>not</strong></em> automatically
+search for header files in these directories.
+</p>
+</div><!-- introduction -->
+<div class="overlapped" id="default-search">
+<h3>Identifying MinGW&#8217;s Default Include Path</h3>
+<p>So,
+if MinGW compilers don&#8217;t search in these <em>&#8220;normal&#8221;</em> directories,
+where <em><strong>do</strong></em> they search?
+</p>
+<p>Before answering this,
+it may be useful to understand <em>why</em>
+the MinGW compilers do not search in these directories.
+Firstly, on a native MS&#8209;Windows host,
+these directories do not typically exist;
+the nature of the file system,
+with multiple distinct roots
+distributed over multiple distinctly named devices,
+means that such path names would be ambiguous.
+Secondly, since MinGW itself is <em>not</em> a suite of MSYS applications,
+even if such directories are created in the MSYS environment,
+being <em>native MS&#8209;Windows</em> applications,
+the MinGW compilers would have no means to locate them.
+</p>
+<p>Thus,
+to avoid imposing draconian restrictions on how users install MinGW,
+the maintainers have chosen to adopt a restricted search paradigm,
+which is determined on the basis of where MinGW is itself installed.
+The actual search path,
+for any specific installation of MinGW may be determined,
+by running the compiler itself,
+with the &#8216;<code>-v</code>&#8217; option;
+typically, for a MinGW&#8209;GCC installation in <code>C:\MinGW</code>,
+we might see something similar to the following,
+from (the now dated, but nonetheless still typical)
+MinGW&#8209;GCC&#8209;3.4.5:&ndash;
+</p>
+<pre class="vt box-out">
+$ <kbd>touch foo.c bar.cpp</kbd>
+$ <kbd>gcc -v -c foo.c</kbd>
+:
+#include &quot;...&quot; search starts here:
+#include &lt;...&gt; search starts here:
+ c:/mingw/bin/../lib/gcc/mingw32/3.4.5/../../../../include
+ c:/mingw/bin/../lib/gcc/mingw32/3.4.5/include
+End of search list.
+:
+
+$ <kbd>g++ -v -c bar.cpp</kbd>
+:
+#include &quot;...&quot; search starts here:
+#include &lt;...&gt; search starts here:
+ c:/mingw/bin/../lib/gcc/mingw32/3.4.5/../../../../include/c++/3.4.5
+ c:/mingw/bin/../lib/gcc/mingw32/3.4.5/../../../../include/c++/3.4.5/mingw32
+ c:/mingw/bin/../lib/gcc/mingw32/3.4.5/../../../../include/c++/3.4.5/backward
+ c:/mingw/bin/../lib/gcc/mingw32/3.4.5/../../../../include
+ c:/mingw/bin/../lib/gcc/mingw32/3.4.5/include
+End of search list.
+:
+</pre>
+<p>This raw&#8209;format output, as displayed by the compilers,
+may be difficult for human readers to interpret.
+Thus, it may be helpful to reduce it to canonical path forms:&ndash;
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -v -c foo.c 2&gt;&amp;1 | sed ':1;s,/[^/.][^/]*/\.\./,/,;t 1'</kbd>
+:
+#include &quot;...&quot; search starts here:
+#include &lt;...&gt; search starts here:
+ c:/mingw/include
+ c:/mingw/lib/gcc/mingw32/3.4.5/include
+End of search list.
+:
+
+$ <kbd>g++ -v -c bar.cpp 2&gt;&amp;1 | sed ':1;s,/[^/.][^/]*/\.\./,/,;t 1'</kbd>
+:
+#include &quot;...&quot; search starts here:
+#include &lt;...&gt; search starts here:
+ c:/mingw/include/c++/3.4.5
+ c:/mingw/include/c++/3.4.5/mingw32
+ c:/mingw/include/c++/3.4.5/backward
+ c:/mingw/include
+ c:/mingw/lib/gcc/mingw32/3.4.5/include
+End of search list.
+:
+</pre>
+</div><!-- default-search -->
+<div class="overlapped" id="other-defaults">
+<h3>Other Directories Searched by Default</h3>
+<p>The minimal list of directories,
+identified as described above,
+specifies the <em><strong>only</strong></em> locations
+which will be searched <em><strong>by default</strong></em>,
+for system header files,
+or for headers associated with user installed libraries;
+however, there is <em><strong>one</strong></em> exception.
+Astute readers may have noticed that
+the include file search path is itemised in a pair of sequential lists,
+with the second being concatenated to the first; however, the first,
+identified as the
+<code>#include</code>&nbsp;<code>&quot;...&quot;</code>&nbsp;<code>search</code>
+list appears to be empty.
+In reality, this apparent emptiness may be misleading;
+unless the user specifies the &#8216;<code>-I-</code>&#8217; option
+when invoking GCC, this list contains <em>exactly</em> one directory:
+the directory in which the source file containing the
+<code>#include</code>&nbsp;<code>&quot;file&quot;</code> directive resides.
+</p>
+<p>Notice that this one additional directory
+is <em><strong>not</strong></em> searched for headers specified
+with the <code>#include</code>&nbsp;<code>&lt;file&gt;</code> form of
+the <code>#include</code> directive;
+it applies only for those headers specified using
+the <code>#include</code>&nbsp;<code>&quot;file&quot;</code> form of the directive.
+Also note that the location of this additional directory is not fixed;
+it is dependent on the location of the source file being compiled,
+and, while unique for each individual source file,
+it may vary even within the compilation scope for any project,
+<em>and even within the scope of a single translation unit</em>,
+if multiple source files are distributed among different directories
+in the project&#8217;s source hierarchy.
+</p>
+<p>To clarify this point,
+let us consider a trivial example.
+Suppose that we have a small project,
+which provides all of it&#8217;s sources in a single directory;
+among them we might have:&ndash;
+</p>
+<pre class="box-out">
+~/src
+   :
+   :--- bar.h
+   :
+   :--- foo.c
+   :--- foo.h
+   :
+</pre>
+<p>Further suppose that the file, <code>foo.c</code>,
+includes the project&#8209;local header, <code>foo.h</code>:&ndash;
+</p>
+<pre class="box-out">
+/* foo.c
+ */
+ :
+#include &quot;foo.h&quot;
+ :
+</pre>
+<p>and that <code>foo.h</code>, in turn,
+includes <code>bar.h</code>:&ndash;
+</p>
+<pre class="box-out">
+/* foo.h
+ */
+ :
+#include &quot;bar.h&quot;
+ :
+</pre>
+<p>With this arrangement,
+we may create a build directory which is a sibling of <code>src</code>,
+and with that as current directory,
+we may compile <code>foo.c</code>:&ndash;
+</p>
+<pre class="vt box-out">
+$ <kbd>mkdir ~/build</kbd>
+$ <kbd>cd ~/build</kbd>
+$ <kbd>gcc -c ../src/foo.c</kbd>
+$
+</pre>
+<p>and we might have every expectation that it will compile correctly;
+it certainly should have no problem finding the pair of header files,
+<code>foo.h</code> and <code>bar.h</code>.
+</p>
+<p>Now, suppose that the project grows
+to such a size that we decide to separate our headers
+into a subdirectory of <code>src</code>:&ndash;
+</p>
+<pre class="box-out">
+~/src
+   :
+   :--- foo.c
+   :
+   :--- hdr
+   :     :
+   :     :--- bar.h
+   :     :--- foo.h
+   :     :
+</pre>
+<p>After making this rearrangement,
+if we again try to compile <code>foo.c</code>,
+we will likely see errors resulting from the failure
+to locate the header file <code>foo.h</code>:&ndash;
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -c ../src/foo.c</kbd>
+../src/foo.c:3:17: foo.h: No such file or directory
+ :
+$
+</pre>
+<p>To correct this, we must also modify <code>foo.c</code>,
+to reflect the relocation of the header files:&ndash;
+</p>
+<pre class="box-out">
+/* foo.c
+ */
+ :
+#include &quot;hdr/foo.h&quot;
+ :
+</pre>
+<p>and this should be sufficient to again let us compile
+<code>foo.c</code> successfully:&ndash;
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -c ../src/foo.c</kbd>
+$
+</pre>
+<p> Note here,
+that we did <em><strong>not</strong></em> make any corresponding change
+in <code>bar.h</code>; that would have been wrong!
+The rule is that, in any <code>#include</code> directive of the form:&ndash;
+</p>
+<pre class="box-out">#include &quot;path/file&quot;</pre>
+<p><code>path</code> must be a <em><strong>relative</strong></em> path,
+and it must be relative to the directory in which the file containing
+the pertinent <code>#include</code> directive is itself located.
+In our example,
+since <code>foo.h</code> and <code>bar.h</code> are still
+in the same directory,
+searches for files included by either will commence in that same directory.
+If we had changed <code>foo.h</code>,
+in a manner similar to the change we made in <code>foo.c</code>,
+then <code>foo.h</code> would have attempted
+to <code>#include</code> the file <code>~/src/hdr/hdr/bar.h</code>,
+instead of the intended <code>~/src/hdr/bar.h</code>.
+</p>
+</div><!-- other-defaults -->
+<div class="overlapped" id="extra-includes">
+<h3>Including Headers from Directories which are Not Searched by Default</h3>
+<p>While the default header search paths may suffice
+for many simple projects,
+as project complexity grows,
+it will often become more convenient to collect header files into
+a central directory which is <em><strong>not</strong></em> in
+the default search path;
+this is particularly true of projects which provide,
+and possibly install,
+one or more function libraries,
+either exclusively for their own use,
+or maybe even for general use by other projects.
+In such cases,
+GCC must be <em><strong>explicitly</strong></em> notified,
+by specifying appropriate command line options,
+to identify the additional directories in which to search.
+</p>
+<p>The relevant sections of
+<a rel="noopener noreferrer" target="_blank"
+ href="https://gcc.gnu.org/onlinedocs/gcc/Preprocessor-Options.html#Preprocessor-Options"
+>the GCC Manual</a>,
+and its associated C preprocessor manual,
+<a rel="noopener noreferrer" target="_blank"
+ href="https://gcc.gnu.org/onlinedocs/cpp/Invocation.html#Invocation"
+>document several options</a>,
+which may be used to specify directories to search for header files;
+of these,
+the most widely used is the
+<code>-I</code>&nbsp;<code><em>dir</em></code> option.
+As an example of its use, let us reconsider the previous example,
+with the project source files organised within the hierarchy:&ndash;
+</p>
+<pre class="box-out">
+~/src
+   :
+   :--- foo.c
+   :
+   :--- hdr
+   :     :
+   :     :--- bar.h
+   :     :--- foo.h
+   :     :
+</pre>
+<p>but this time,
+we will <em><strong>not</strong></em> adapt <code>foo.c</code>
+to locate <code>foo.h</code> using the default include file search path:&ndash;
+</p>
+<pre class="box-out">
+/* foo.c
+ */
+ :
+#include &quot;foo.h&quot;
+ :
+</pre>
+<p>As we saw previously,
+if we try to compile this unmodified <code>foo.c</code>,
+without explicitly specifying any header search path,
+the compilation will fail:&ndash;
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -c ../src/foo.c</kbd>
+../src/foo.c:3:17: foo.h: No such file or directory
+ :
+$
+</pre>
+<p>Previously,
+we corrected this failure by modifying <code>foo.c</code>,
+to bring <code>foo.h</code> into the
+default <code>#include</code>&nbsp;<code>&quot;...&quot;</code> search path.
+This time, we will correct it, not by modifying <code>foo.c</code>,
+but by <em><strong>explicitly</strong></em> adding our project&#8217;s
+local <code>hdr</code> directory to the search path,
+when we invoke GCC to compile <code>foo.c</code>:&ndash;
+</p>
+<pre class="vt box-out">
+$ <kbd>gcc -I ../src/hdr -c ../src/foo.c</kbd>
+$
+</pre>
+<p>which, we may observe, again results in successful compilation.
+</p>
+</div><!-- extra-includes -->
+<div class="overlapped" id="third-party">
+<h3>Using Headers Provided with Locally Installed External Libraries</h3>
+<p>Many projects have dependencies on external libraries,
+which are <em>not</em> provided by a standard MinGW installation.
+Users who wish to build the applications provided by such projects
+must first install the appropriate prerequisite libraries.
+Such libraries are referred to as
+<em>&#8220;locally installed libraries&#8221;</em>,
+and they must be installed such that MinGW&#8217;s GCC can readily
+locate both the libraries themselves,
+<em>and</em> any header files installed as prerequisites
+for specifying the interface to the library functions.
+</p>
+<p>The installation of
+such external libraries may be viewed as a challenge,
+for some users.
+Typically,
+and particularly in the case of library packages
+originally developed for Unix&#8209;like platforms,
+such libraries would be installed into
+the <code>/usr/local/...</code> directory hierarchy.
+However, as we have seen above,
+MinGW&#8217;s GCC
+does not consider any such hierarchy in its default search paths,
+either for header files, or for libraries.
+Thus, the challenge is to choose an installation strategy
+which achieves a satisfactory compromise between:&ndash;
+</p>
+<ol>
+<li>Installing directly into MinGW&#8217;s own standard
+ <code>&lt;mingw-root&gt;/include</code>
+ and <code>&lt;mingw-root&gt;/lib</code> directory hierarchies;
+ this offers the advantage that the libraries,
+ and their associated header files,
+ are placed directly into MinGW&#8209;GCC&#8217;s default search paths,
+ so there is no additional burden placed on the user,
+ to add additional <code>-I</code>&nbsp;<code><em>dir</em></code> options,
+ throughout the build systems of any project using an external library.
+ However, while perhaps being the simplest option,
+ this strategy is not without its disadvantages:&ndash;
+ <ul style="margin: 0.3em 0 0 -1em; list-style: disc">
+ <li>The external library components are intermingled,
+  within the file system hierarchy,
+  with MinGW&#8217;s own standard components;
+  it may not be straightforward to segregate them later,
+  should this ever be necessary.
+ </li>
+ <li>Should the user wish to maintain <em>side&#8209;by&#8209;side</em>
+  MinGW installations, at differing release point versions, say,
+  then the external library installations will need to be duplicated,
+  within each of the separate MinGW installation hierarchies.
+ </li>
+ <li>If the MinGW installation hierarchy is purged,
+  in preparation for a clean re&#8209;installation,
+  then any locally installed external libraries will also be purged,
+  and if subsequently needed, will have to be reinstalled.
+ </li>
+</ul>
+<li>Creating a separate directory hierarchy,
+ into which all external library packages are installed;
+ this mitigates the disadvantages of option (1),
+ but introduces its own drawbacks:&ndash;
+ <ul style="margin: 0.3em 0 0 -1em; list-style: disc">
+ <li>The header files and libraries are no longer in
+  MinGW GCC&#8217;s default search paths;
+  thus the user <em><strong>must</strong></em> make provision
+  to pass the appropriate <code>-I</code>&nbsp;<code><em>dir</em></code>,
+  (and associated <code>-L</code>&nbsp;<code><em>dir</em></code>),
+  options to GCC, through his own projects&#8217; build systems.
+  (This may be mitigated, in turn, by customising the
+  <a target="_blank" href="index.html?page=gccspecs.html"
+  ><em>GCC Specs File</em></a>,
+  to supply the necessary options <em>automatically</em>,
+  for <em>all</em> invocations of GCC,
+  or by appropriately defining GCC&#8217;s
+  <a rel="noopener noreferrer" target="_blank"
+   href="http://gcc.gnu.org/onlinedocs/cpp/Environment-Variables.html#Environment-Variables"
+  ><em>CPATH and related environment variables</em></a>).
+ </li>
+ <li>Although now segregated from the MinGW standard library
+  and header components, all external library packages are still intermixed,
+  one with another, in a common installation hierarchy; nonetheless,
+  this is often considered to be an acceptable compromise.
+ </li>
+</ul></li>
+<li>As a variation on option (2),
+ create a separate directory hierarchy,
+ for <em>each</em> and <em>every individual</em> external library package
+ to be locally installed;
+ this mitigates all of the disadvantages of option (1),
+ and the package intermixing of option (2),
+ but it incurs an alternative penalty:&ndash;
+ <ul style="margin: 0.3em 0 0 -1em; list-style: disc">
+ <li>As with option (2),
+  appropriate <code>-I</code>&nbsp;<code><em>dir</em></code>
+  and <code>-L</code>&nbsp;<code><em>dir</em></code> options
+  <em>must</em> be added to each GCC invocation; however,
+  whereas option (2) requires only one additional path of each type,
+  this option requires an additional one of each type,
+  for <em>each</em> and <em>every</em> external library to be deployed.
+  (While this may still be achieved by appropriate customisation of the
+  <a target="_blank" href="index.html?page=gccspecs.html#isystem"
+  ><em>GCC Specs File</em></a>,
+  or by appropriately specifying the
+  <a rel="noopener noreferrer" target="_blank"
+   href="http://gcc.gnu.org/onlinedocs/cpp/Environment-Variables.html#Environment-Variables"
+  ><em>CPATH and related environment variables</em></a>,
+  the additional complexity, and maintenance overhead,
+  may be considered unacceptable to many users).
+ </li>
+</ul>
+</li></ol>
+</div><!-- third-party -->
+
+<!-- $RCSfile$: end of file -->
