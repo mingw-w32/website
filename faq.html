@@ -205,6 +205,55 @@ may be found within <a rel="noopener noreferrer" target="_blank"
 >the MinGW File Release System</a>.
 </p>
 </div><!-- answer -->
+<button>What is &#8220;make&#8221;, and how do I use it?</button>
+<div class="answer">
+<p>Originating in Unix,
+and now specified as a formally required POSIX.1 utility,
+(and even emulated by Microsoft, with varying degrees of fidelity,
+originally preserving the name <code>make</code>,
+and more recently supplanted by <code>nmake</code>&hairsp;),
+<code>make</code> is a utility program to assist in the
+maintenance of an entire suite of application software,
+(or indeed,
+in the maintenance of any suite of published documents
+which must be generated from a collection of document source files).
+</p>
+<p>Controlled by a configuration file, known as a <code>makefile</code>,
+(or maybe, by a hierarchical system of <code>makefiles</code>&hairsp;),
+which defines a &#8220;<em>dependency graph</em>&hairsp;&#8221;,
+in which the relationships between generated files
+and their respective source files are specified,
+together with the sequences of commands which must be executed,
+to regenerate each of the generated files from its respective sources,
+<code>make</code> will, when invoked, compare the time&#8209;stamps
+of each of the generated files with <em>all</em>&hairsp;
+of its prerequisite source files, and,
+for any generated file which does not yet exist,
+or is found to be older than
+<em>any one</em>&hairsp; (or more) of its sources,
+run the sequence of commands to create, or regenerate that file.
+This may offer significant benefit of time saving,
+when a large collection of generated files is to be maintained,
+since any which are found to be up&#8209;to&#8209;date,
+when <code>make</code> is invoked,
+do not need to be generated again.
+</p>
+<p>The MinGW.OSDN Project offers two variants of
+the GNU implementation of <code>make</code>,
+(which supports many functional enhancements over traditional Unix
+<code>make</code>, and POSIX <code>make</code>&hairsp;):
+a variant simply called <code>make</code>,
+which must be run in the MSYS shell environment,
+and a further variant suitable for use from <code>cmd.exe</code>,
+known as <code>mingw32&#8209;make</code>.
+Each of these is used in, fundamentally, the same manner.
+However, a discussion of <em>how</em>&hairsp; to use them would be
+too extensive to conveniently cover here;
+we suggest that you refer to <a target="_blank" rel="noopener noreferrer"
+ href="https://www.gnu.org/software/make/manual/"
+>the online GNU <code>make</code> manual</a> for guidance.
+</p>
+</div><!-- answer -->
 <button>How can I get help, if I can&#8217;t find an answer here?</button>
 <div class="answer">
 <p>Presumably,
