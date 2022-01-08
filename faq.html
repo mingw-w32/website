@@ -8,7 +8,7 @@
  * $Id$
  *
  * Written by Keith Marshall <keith@users.osdn.me>
- * Copyright (C) 2021, MinGW.OSDN Project
+ * Copyright (C) 2021, 2022, MinGW.OSDN Project
  *
  *
  * Redistribution and use in source and 'compiled' forms (SGML, HTML,
@@ -47,6 +47,7 @@
  *    &#8217;   typographic apostrophe/right (closing) single quote
  *    &#8220;   typographic left (opening) double quote
  *    &#8221;   typographic right (closing) double quote
+ *    &#8239;   narrow non-breaking space
  *
 -->
 <script class="masthead">
@@ -88,11 +89,13 @@ a further click on the question will dismiss the view of the answer.
 <div class="answer">
 <p>Created by Colin Peters,
 and released to the public domain,
-the original MinGW &mdash; or &#8220;Minimalist GNU for Windows&#8221;
-&mdash; was a system of import libraries, header files, and supporting
-&#8220;glue&#8221; code, to facilitate the use of Microsoft&#8217;s
-<code>CRTDLL.DLL</code> &mdash; and later <code>MSVCRT.DLL</code> &mdash;
-as the primary run&#8209;time support for a native MS&#8209;Windows port
+the original MinGW&#8239;&mdash;&#8239;or &#8220;Minimalist GNU for
+Windows&#8221;&#8239;&mdash;&#8239;was a system of import libraries,
+header files, and supporting &#8220;glue&#8221; code,
+to facilitate the use of Microsoft&#8217;s
+<code>CRTDLL.DLL</code>&#8239;&mdash;&#8239;and
+later <code>MSVCRT.DLL</code>&#8239;&mdash;&#8239;as
+the primary run&#8209;time support for a native MS&#8209;Windows port
 of the GNU Compiler Collection (GCC), and its supporting utilities,
 (which, in turn, were originally provided by Jan&#8209;Jaap van der Heijden).
 </p>
@@ -317,9 +320,9 @@ ensuring that each such reference is placed <em>after</em>&hairsp;
 all named source and object files which refer to it,
 <em>and</em>&hairsp;, if any library refers to another,
 that the <em>referring</em>&hairsp; library is named <em>before</em>&hairsp;
-any to which it refers; (note: in the event of circular
-references among libraries &mdash; a design fault &mdash;
-this may require some libraries to be named more than once).
+any to which it refers; (note: in the event of circular references among
+libraries&#8239;&mdash;&#8239;a design fault&#8239;&mdash;&#8239;this
+may require some libraries to be named more than once).
 </p>
 <p>Moreover, if any named library cannot be found in the
 linker&#8217;s default search path, you may also need to specify
