@@ -425,6 +425,49 @@ options, as advised in
 >this additional user guide</a>.
 </p>
 </div><!-- answer -->
+<button>I&#8217;m working on Windows&#8209;XP,
+but the MinGW compiler doesn&#8217;t seem to recognize this;
+is this a bug?
+</button>
+<div class="answer">
+<p>No, it is <em>not</em>&hairsp; a bug.
+The version of Windows, on which you are working,
+is <em>fundamentally irrelevant</em>&hairsp;;
+what <em>is</em>&hairsp; important is the extent to which
+you would like your application to run on older versions of Windows,
+and, in line with MinGW.OSDN&#8217;s legacy platform support policy,
+the MinGW compiler sets its <em>default level</em>&hairsp; of API
+support <em>very</em>&hairsp; conservatively,
+to ensure support for <em>all</em>&hairsp; versions of Windows,
+from Windows&#8209;NT4 (or Windows&#8209;95) onwards.
+</p>
+<p>Of course,
+you may wish to take advantage of some newer API capabilities,
+which are not supported on these legacy versions of Windows,
+and you are willing to sacrifice legacy support in order to do so.
+In this respect,
+MinGW and Microsoft&#8217;s compilers exhibit similar behaviour,
+(although newer versions of Microsoft&#8217;s SDK may set a less
+conservative level of legacy support);
+if you wish to support any API function,
+which is not supported by the compiler&#8217;s default Windows version,
+then the onus is on <em>you</em>&hairsp; to enable support for the
+newer API version,
+as stipulated in <a target="_blank" rel="noopener noreferrer"
+ href="https://docs.microsoft.com/en-gb/cpp/porting/modifying-winver-and-win32-winnt"
+>this Microsoft documentation</a>,
+(but note that,
+whereas Microsoft no longer offer support for Windows&#8209;2000,
+or earlier, nor any version of Windows&#8209;9x,
+MinGW <em>does</em>&hairsp; endeavour to support these legacy Windows versions,
+by setting <code>WINVER</code> and
+<code>_WIN32_WINNT</code>&#8239;&mdash;&#8239;and
+<code>_WIN32_WINDOWS</code> for
+Windows&#8209;9x&#8239;&mdash;&#8239;to
+appropriate values,
+as defined in the MinGW version of <code>&lt;sdkddkver.h&gt;</code>&hairsp;).
+</p>
+</div><!-- answer -->
 <button>Why does the MinGW linker
 persistently report &#8220;undefined reference&#8221; errors,
 when I have specified all of the libraries
