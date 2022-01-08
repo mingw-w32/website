@@ -110,6 +110,50 @@ of native MS&#8209;Windows applications, with no implicit dependency on any
 3rd&#8209;party C&#8209;Runtime DLL.
 </p>
 </div><!-- answer -->
+<button>What is Cygwin, and how does it differ from MinGW?</button>
+<div class="answer">
+<p>Originated by Steve Chamberlain, in 1995, like MinGW,
+Cygwin is a system which aims to make (primarily) GNU tools
+available on the MS&#8209;Windows platform;
+however, the two systems adopt <em>entirely different</em>&hairsp;
+methodologies to achieve this objective.
+</p>
+<p>Both systems are based on GNU tooling,
+and both use the GNU Compiler Collection (GCC) as the means
+of production for their respective application suites.
+Since GNU is fundamentally a POSIX system,
+both MinGW and Cygwin tools exhibit a POSIX feel;
+however, whereas MinGW strives to minimize its POSIX influence,
+using the MS&#8209;Windows API <em>directly</em>,&hairsp;
+and thus,
+MinGW applications may be classified as <em>native</em>&hairsp;
+MS&#8209;Windows applications,
+Cygwin has a much loftier objective ... it aims to provide a complete
+emulation of the <em>entire</em>&hairsp; POSIX.1 API!
+This emulation is encapsulated within a single <code>cygwin1.dll</code>
+shared object library, which serves as a bridge between the POSIX.1 API
+and the MS&#8209;Windows API, and upon which <em>all</em>&hairsp;
+Cygwin applications are dependent; consequently,
+Cygwin applications are <em>not</em>&hairsp; classified
+as <em>native</em>&hairsp; MS&#8209;Windows applications.
+</p>
+<p>The availability of the POSIX.1 API,
+furnished by <code>cygwin1.dll</code>, does generally reduce
+the effort required to port GNU applications to Cygwin,
+(for example, POSIX functions such as <code>fork()</code>,
+<code>mmap()</code>, and <code>ioctl()</code> may not be
+<em>readily</em>&hairsp; implemented in terms of the MS&#8209;Windows API,
+and would require <em>significant</em>&hairsp; porting
+effort&#8239;&mdash;&#8239;if indeed it is even
+feasible&#8239;&mdash;&#8239;to
+support them in MinGW applications);
+however, the reduced porting burden of Cygwin <em>does</em>&hairsp;
+incur the cost of the dependency on <code>cygwin1.dll</code>,
+and its attendant commercial,
+or strict &#8220;<em>copyleft</em>&hairsp;&#8221; (GPL),
+licensing requirement.
+</p>
+</div><!-- answer -->
 <button>What is MSYS?</button>
 <div class="answer">
 <p>A contraction of &#8220;Minimal SYStem&#8221;,
