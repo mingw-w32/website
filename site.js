@@ -51,24 +51,32 @@ function set_page( title, text )
   set_content( "page-".concat( title ), text.replace( /-/g, "&#8209;" ));
 }
 
-function load_content( container, src )
+function load_content( container, src, fallback, wanted )
 { /* Set the content of the specified HTML "container" element, by
    * injection of the entire contents of an external file which is
    * fetched by http server request; (either an http, or an https,
    * server connection is required; does not work for local files).
    */
   var request_handler = new XMLHttpRequest();
+  function send_e404_notification( name )
+  { var notification = set_content( "e404-missing-page", name );
+    if( notification ) notification.removeAttribute( "id" );
+  }
+  function e404_subst( name ){ return name ? name : "missing.html"; }
   request_handler.onreadystatechange = function()
   { if( this.readyState == this.DONE )
       switch( this.status )
       { case 200:
 	  var element = set_content( container, this.responseText );
-	  var idx; element = element.getElementsByTagName( "script" );
-	  set_content( "e404-missing-page", document.URL );
-	  for( idx = 0; idx < element.length; idx++ )
-	  { var onload_action = Function( element[idx].innerHTML );
-	    onload_action();
+	  if( element )
+	  { var idx = 0; element = element.getElementsByTagName( "script" );
+	    while( element[idx] )
+	    { var onload_action = Function( element[idx++].innerHTML );
+	      onload_action();
+	    }
 	  }
+	  else if( container ) container.innerHTML = this.responseText;
+	  send_e404_notification( fallback ? wanted : document.URL );
 	  if( src.includes("#") )
 	  { src = src.substring( src.indexOf("#") + 1, src.length );
 	    element = document.getElementById( src );
@@ -76,7 +84,7 @@ function load_content( container, src )
 	  }
 	  break;
 	case 404:
-	  load_content( container, "missing.html" );
+	  load_content( container, e404_subst( fallback ), fallback, src );
       }
   }
   request_handler.open( "GET", src, true );
