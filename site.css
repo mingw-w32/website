@@ -474,8 +474,8 @@ table.borderless tr.leaded td
 table.borderless code
 { color: inherit;
 }
-table.top-aligned tr td, table.top-aligned tr tr
-{ vertical-align: top;
+table.top-aligned tr
+{ vertical-align: baseline;
 }
 
 p + table.borderless { margin: 0.3em -0.2em; }
