@@ -8,7 +8,7 @@
  * $Id$
  *
  * Written by Keith Marshall <keith@users.osdn.me>
- * Copyright (C) 2020, 2021, MinGW.OSDN Project
+ * Copyright (C) 2020-2022, MinGW.OSDN Project
  *
  *
  * Redistribution and use in source and 'compiled' forms (SGML, HTML,
@@ -60,10 +60,10 @@ h3
    * default h3 styling, but pull the following paragraph a
    * bit closer.
    */
-  margin-bottom: -0.2em;
+  margin-bottom: -0.2em; font-size: 1.25em;
 }
 h4
-{ margin: 0.8em 0 -0.2em;
+{ margin: 0.8em 0 -0.2em; font-size: 1.10em;
 }
 hr
 { /* Match the colour of horizontal page dividing rules to that
@@ -121,6 +121,12 @@ p+ul, p+ol, p+dl
 }
 ul li, ol li
 { margin-top: 0.12em; margin-right: 1.2em;
+}
+ol.small-numbers li::marker
+{ font-size: 85%;
+}
+div.box-out ol.small-numbers li::marker
+{ font-size: 80%;
 }
 ul li:first-child, ol li:first-child
 { margin-top: 0;
@@ -351,7 +357,7 @@ hr+div.overlapped
    * number, and prefix it to the heading text.
    */
   counter-increment: h3-number;
-  font-family: inherit; font-size: 0.87em; font-weight: bold;
+  font-family: inherit; font-size: 85%; font-weight: bold;
   content: counter(h3-number) ". ";
 }
 
@@ -418,7 +424,7 @@ div.box-out
    * rather than for preformatted content, adjust its text size to
    * appear slightly larger than adjacent running text...
    */
-  font-size: 1.025em;
+  font-size: 102.5%;
 }
 div.box-out p:first-child
 { /* ...and avoid a excessive gap between the top of the bounding
@@ -502,7 +508,7 @@ form.search input
   display: block; outline: none; box-sizing: border-box;
   border: 1px solid #003366; border-right: none; border-radius: 7px 0 0 7px;
   height: 30px; width: calc( 100% - 60px ); padding: 0.6em;
-  font-size: 0.8em; background-color: #f3f3ff;
+  font-size: 80%; background-color: #f3f3ff;
 }
 form.search button
 { /* ...with a search button occupying the rightmost 60px.
