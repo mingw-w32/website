@@ -86,13 +86,6 @@ a:visited
    */
   color: #aa00cc;
 }
-a code
-{ /* Whereas code samples, within running text, are displayed in a
-   * reduced-intensity colour, when encapsulated within a reference
-   * anchor, the anchor colour should prevail.
-   */
-  color: inherit;
-}
 p
 { /* Use the browser's default paragraph styling, but tighten the
    * inter-paragraph spacing...
@@ -432,10 +425,9 @@ div.box-out p:first-child
    */
   margin-top: 0;
 }
-pre.vt, code
+pre.vt
 { /* Use a lighter text colour, to highlight code samples in
-   * running text, and the machine-output in "video-terminal"
-   * style displays...
+   * machine-output in "video-terminal" style displays...
    */
   color: #666699;
 }
@@ -476,9 +468,6 @@ table.borderless th
 }
 table.borderless tr.leaded td
 { padding-top: 0.3em;
-}
-table.borderless code
-{ color: inherit;
 }
 table.top-aligned tr
 { vertical-align: baseline;
