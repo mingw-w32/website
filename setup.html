@@ -569,8 +569,39 @@ this, then the <code>PATH</code> setting in the process environment
 you <em>should</em>&hairsp; modify the environment configuration,
 as advised below.
 </li></ul>
-<p>If the preceding check indicates that
+<p>Additionally,
+a number of MinGW applications&nbsp;&mdash;&nbsp;any comtemporary
+version of the GNU Debugger being a notable example&nbsp;&mdash;&nbsp;may
+require a definition of the <code>HOME</code> environment variable.
+Typically,
+<code>Unix</code> systems define this,
+to represent the path name of the current user&#8217;s
+default working directory,
+but MS&#8209;Windows uses the <code>USERPROFILE</code> variable
+for this purpose,
+so <code>HOME</code> is not normally defined.
+</p>
+<p>To check whether the <code>HOME</code> variable is defined,
+or not:&ndash;
+</p>
+<ul><li>Run the command:
+<pre class="vt box-out">
+C:\Users\me&gt; <kbd>echo %HOME%</kbd>
+</pre>
+in a <code>Command</code>&#8197;<code>Prompt</code> console window;
+if <code>HOME</code> has been suitably configured,
+this should produce output similar to:
+<pre class="vt box-out">
+C:\Users\me&gt; <kbd>echo %HOME%</kbd>
+C:\Users\me
+</pre>
+but it is more likely to produce no output at all,
+in which case you should consider adding a <code>HOME</code> variable
+definition to your environment variables configuration.
+</li></ul>
+<p>If the preceding checks indicate that
 the <code>PATH</code> configuration needs to be adjusted,
+or that the <code>HOME</code> variable has not been defined,
 then you should proceed as follows:&ndash;
 </p><ul>
 <li>From the system <span class="nowrap">
@@ -636,6 +667,11 @@ assign your equivalent for <code>C:\MinGW\bin</code>,
 with prefix substitution as required,
 as its value.
 </li>
+<li>Similarly, to add a definition for the <code>HOME</code> variable,
+click the <code>New</code> button, and create the requisite entry;
+it should be given a suitable value, which typically, could be to
+inherit the value of the <code>USERPROFILE</code> variable.
+</li>
 <li>Click the <code>OK</code> button on each nested dialogue box,
 as you walk focus back to the top level of the <span class="nowrap">
 <code>Control</code>&#8197;<code>Panel</code></span>,
@@ -681,24 +717,26 @@ you should name this new &#8220;shortcut&#8221; as
 or any similar alternative name of your own choice.
 <li>Set the <code>Target</code> of your new &#8220;shortcut&#8221; to:
 <pre class="vt box-out">
-<kbd>%comspec% /k path %PATH%;C:\MinGW\bin</kbd>
+<kbd>%comspec% /c path %PATH%;C:\MinGW\bin&amp;set HOME=%USERPROFILE%&amp;%comspec%</kbd>
 </pre>
 (with substitution for <code>C:\MinGW</code>, as appropriate,
 if you chose an alternative prefix at installation time).
 Alternatively, create a new MS&#8209;Windows batch file,
 (called <span class="nowrap"><code>C:\MinGW\mingw.bat</code>,</span>
-for example), within which the:
+for example), with content similar to:
 <pre class="vt box-out">
+<kbd>set HOME=%USERPROFILE%</kbd>
 <kbd>path %PATH%;C:\MinGW\bin</kbd>
+<kbd>%comspec%</kbd>
 </pre>
-<code>PATH</code> augmentation command is executed,
 and set the &#8220;shortcut&#8221; <code>Target</code> to:
 <pre class="vt box-out">
-<kbd>%comspec% /k C:\MinGW\mingw.bat</kbd>
+<kbd>%comspec% /c C:\MinGW\mingw.bat</kbd>
 </pre>
 (This latter alternative offers greater flexibility than the former,
 insofar as the batch file may be modified to accommodate configuration
-options beyond the minimally required <code>PATH</code> augmentation).
+options beyond the minimally required <code>PATH</code> augmentation,
+and the recommended <code>HOME</code> variable assignment).
 </li>
 <li>Access the properties of the new &#8220;shortcut&#8221;,
 and set the start&#8209;up directory path name, within the
